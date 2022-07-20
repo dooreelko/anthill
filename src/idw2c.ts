@@ -59,7 +59,7 @@ export abstract class KeyValueStore<TKey = string, T extends { id?: TKey } = { i
     }) { };
 
     abstract list: () => T[];
-    abstract get: (criteria: TKey | Partial<T>) => T;
+    abstract get: (criteria: TKey | Partial<T>) => T | undefined;
     abstract delete: (id: TKey) => void;
     abstract put: (elem: T) => T;
 };

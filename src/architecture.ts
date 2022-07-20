@@ -5,7 +5,7 @@
 import {
     Lazy, DockerStates, Queue, KeyValueStore,
     Autoscaler, Topic, ContainerStateEvent, ContainerRuntime,
-    Func, Api, TaskUid, QueuePoller, ApiContext
+    Func, Api, TaskUid, QueuePoller
 } from "./idw2c";
 
 export type Task = {
@@ -85,11 +85,11 @@ export const apiListTasks = new Api<unknown, Task[]>({
     target: listTasksFunction
 });
 
-export const getTaskFunction = new Func<string, Task>({
+export const getTaskFunction = new Func<string, Task | undefined>({
     code: (id) => taskStore.instance.get(id)
 });
 
-export const apiGetTask = new Api<string, Task>({
+export const apiGetTask = new Api<string, Task | undefined>({
     target: getTaskFunction
 });
 

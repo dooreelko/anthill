@@ -1,11 +1,11 @@
-import * as maxim from '../../idw2c';
+import * as maxim from '../idw2c';
 
 export class DockerQueue<T extends Object> extends maxim.Queue<T> {
     private theQueue = [] as T[];
 
     get apiName() { return `queue-${this.name}`; }
 
-    constructor(private readonly name: string, port: number) {
+    constructor(public readonly name: string, public readonly port: number) {
         super();
 
         const putApi = new maxim.Api({

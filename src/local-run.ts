@@ -3,32 +3,76 @@ import { TerraformStack, TerraformOutput } from "cdktf";
 import { Container } from "@cdktf/provider-docker";
 
 import { build as buildApiServer } from './docker/api-server/api-server';
-import { DockerQueue } from './docker/queue/main';
+import { DockerQueue } from './docker/queue';
+import { DockerKeyValueStore } from './docker/key-value-store';
 
 
 export const build = (stack: TerraformStack) => {
-    const taskQueueName = 'task-queue';
-    const taskQueue = new DockerQueue<arch.Task>(taskQueueName, 8000);
+    const taskQueue = new DockerQueue<arch.Task>('task-queue', 8000);
     arch.taskQueue.instance = taskQueue;
 
-    const { server, serverPath } = buildApiServer(stack, taskQueueName);
+    const taskStore = new DockerKeyValueStore<string, arch.Task>('task-store', 8001);
+    arch.taskStore.instance = taskStore;
 
-    const taskQueueRun = new Container(stack, 'taskQueue', {
-        dependsOn: [server],
-        name: taskQueueName,
-        image: server.latest,
-        attach: false,
-        ports: [{
-            external: 8000,
-            internal: 8000
-        }],
-        command: [
-            serverPath,
-            taskQueue.apiName
-        ]
-    });
+    [taskQueue, taskStore]
+        .map(el => {
+            const { server, serverPath } = buildApiServer(stack, el.name);
 
-    new TerraformOutput(stack, 'task-queue-log', {
-        value: taskQueueRun.containerLogs
-    });
+            new Container(stack, 'taskQueue', {
+                dependsOn: [server],
+                name: el.name,
+                image: server.latest,
+                attach: false,
+                ports: [{
+                    external: el.port,
+                    internal: el.port
+                }],
+                command: [
+                    serverPath,
+                    el.apiName
+                ]
+            });
+        });
+
+    // {
+
+    //     const { server, serverPath } = buildApiServer(stack, taskQueue.name);
+
+    //     new Container(stack, 'taskQueue', {
+    //         dependsOn: [server],
+    //         name: taskQueue.name,
+    //         image: server.latest,
+    //         attach: false,
+    //         ports: [{
+    //             external: taskQueue.port,
+    //             internal: taskQueue.port
+    //         }],
+    //         command: [
+    //             serverPath,
+    //             taskQueue.apiName
+    //         ]
+    //     });
+    // }
+
+    // {
+
+    //     const { server, serverPath } = buildApiServer(stack, taskStore.name);
+
+    //     new Container(stack, 'taskStore', {
+    //         dependsOn: [server],
+    //         name: taskStore.name,
+    //         image: server.latest,
+    //         attach: false,
+    //         ports: [{
+    //             external: taskStore.port,
+    //             internal: taskStore.port
+    //         }],
+    //         command: [
+    //             serverPath,
+    //             taskStore.apiName
+    //         ]
+    //     });
+    // }
+
+
 }

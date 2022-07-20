@@ -21,8 +21,6 @@ export const run = (apiName: string) => {
     apis.apis.map(api => ({
         api,
         middleware: async (ctx: Koa.Context, next: Koa.Next) => {
-            console.log(JSON.stringify(ctx));
-            console.log(JSON.stringify(api));
             if (ctx.path !== api.spec.path) {
                 return await next();
             }
