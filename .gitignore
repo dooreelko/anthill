@@ -1,4 +1,5 @@
 *.d.ts
+!src/**/*.d.ts
 *.js
 node_modules
 cdktf.out
@@ -9,3 +10,4 @@ cdktf.log
 tsconfig.tsbuildinfo
 !jest.config.js
 !setup.js
+dist

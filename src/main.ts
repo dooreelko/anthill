@@ -1,14 +1,11 @@
 import { Construct } from "constructs";
 import { App, TerraformStack } from "cdktf";
-import { build as buildLocal } from './local-run';
-import { DockerProvider } from "@cdktf/provider-docker";
+import { build as buildLocal } from './local-docker-run';
 
 export const build = () => {
     class DorcStack extends TerraformStack {
         constructor(scope: Construct, name: string) {
             super(scope, name);
-
-            new DockerProvider(this, "docker", {});
         };
     }
 

@@ -1,4 +1,5 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
     "alwaysStrict": true,
@@ -8,7 +9,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": [
-      "ESNext"
+      "ES2022"
     ],
     "module": "CommonJS",
     "noEmitOnError": true,
@@ -25,7 +26,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2018",
+    "target": "ES2022",
     "incremental": true
   },
   "include": [
@@ -35,5 +36,8 @@
     "node_modules",
     "cdktf.out",
     "dist"
-  ]
+  ],
+  "ts-node": {
+    "files": true
+  }
 }

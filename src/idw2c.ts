@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 export class Lazy<T> {
     private _instance?: T;
 
@@ -17,11 +19,15 @@ export class Lazy<T> {
 }
 
 export class Api<TIn, TOut> {
-    constructor(private init: {
-        target: Func<TIn, TOut> | Queue<TIn>;
-    }) { }
+    public readonly uid: string;
 
-    run(arg: TIn): TOut {
+    constructor(public readonly init: {
+        target: Func<TIn, TOut> | Queue<TIn>;
+    }) {
+        this.uid = randomUUID();
+    }
+
+    exec(arg: TIn): TOut | Promise<TOut> {
         const target = this.init.target;
         if (target instanceof Func) {
             return target.init.code(arg);
@@ -31,12 +37,9 @@ export class Api<TIn, TOut> {
     }
 };
 
-export abstract class Queue<T extends Object> {
-    constructor(private init?: {
-    }) { };
-
-    abstract put: (elem: T) => void;
-    abstract poll(maxItems?: number): T[];
+export interface Queue<T extends Object> {
+    put: Api<T, void>;
+    poll: Api<number | undefined, T[]>;
 };
 
 export class QueuePoller<T> {
@@ -46,28 +49,24 @@ export class QueuePoller<T> {
     }) { };
 };
 
-export abstract class Topic<T> {
-    constructor(private init: {
-    }) { }
-
-    abstract subscribe: (addr: string | Func<T, unknown>) => void;
-    abstract publish: (what: T) => void;
+export interface Topic<T> {
+    subscribe: Api<Api<T, void> | Func<T, void>, void>;
+    publish: Api<T, void>;
 };
 
-export abstract class KeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
-    constructor(private init: {
-    }) { };
-
-    abstract list: () => T[];
-    abstract get: (criteria: TKey | Partial<T>) => T | undefined;
-    abstract delete: (id: TKey) => void;
-    abstract put: (elem: T) => T;
+export interface KeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
+    list: Api<void, T[]>;
+    get: Api<TKey | Partial<T>, T | undefined>;
+    delete: Api<TKey, boolean>;
+    put: Api<T, T>;
 };
 
 export class Func<TIn = undefined, TOut = void>  {
     constructor(public init: {
-        code: (input: TIn) => TOut
+        code: (input: TIn) => TOut | Promise<TOut>
     }) { };
+
+    exec = (input: TIn) => this.init.code(input);
 };
 
 export type ApiContext = {
@@ -76,6 +75,7 @@ export type ApiContext = {
 };
 
 type ApiServerListener = {
+    host: string;
     port: number;
     apis: {
         api: Api<any, any>;
@@ -89,16 +89,39 @@ type ApiServerProps = {
 };
 
 export class ApiServer {
-    static registry: Record<string, ApiServerListener> = {};
+    static registry = new Map<string, ApiServerListener>;
+    static endpointRegistry = new Map<string, string>;
+
+    static getListenerByApiName = (uid: string) => {
+        const entry = this.endpointRegistry.get(uid);
+        if (!entry) {
+            throw new Error(`No individual api registered for uid ${uid}.`);
+        }
+
+        if (!this.registry.has(entry)) {
+            throw new Error(`No api registered for ${entry} from uid ${uid} api.`);
+        }
+
+        const listener = this.registry.get(entry);
+
+        if (!listener) {
+            throw new Error(`Failed finding listener for ${uid}`);
+        }
+
+        return listener;
+    }
 
     constructor(public props: ApiServerProps) {
-        ApiServer.registry[props.name] = props.listener;
+        ApiServer.registry.set(props.name, props.listener);
+        props.listener.apis
+            .map(def => ({ id: def.api.uid, apiName: props.name }))
+            .map(({ id, apiName }) => ApiServer.endpointRegistry.set(id, apiName));
     }
 };
 
 
 export abstract class Autoscaler {
-    constructor(private init: {}) { }
+    constructor(private init?: {}) { }
 
     abstract get nodeCount(): number;
     abstract set nodeCount(newCount: number);
@@ -111,16 +134,24 @@ export type DockerStates = 'created' | 'restarting' | 'running' | 'paused' | 'ex
 export type ContainerStateEvent = {
     uid: string;
     status: DockerStates;
+    message?: string;
     exitCode: number;
 };
 
 export type TaskUid = string;
 
-export abstract class ContainerRuntime {
-    constructor(private init: {
-        autoscaler: Autoscaler;
-        stateChangeTopic: Topic<ContainerStateEvent>;
-    }) { };
+export type ContainerRuntimeInit = {
+    autoscaler: Autoscaler;
+    stateChangeTopic: Topic<ContainerStateEvent>;
+};
 
-    abstract run: (command: string) => TaskUid;
+export type DockerRun = {
+    image: string;
+    cmd: string[];
+};
+
+export abstract class ContainerRuntime {
+    constructor(public init: ContainerRuntimeInit) { };
+
+    abstract run: Api<DockerRun, TaskUid>;
 };

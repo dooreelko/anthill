@@ -1,6 +1,6 @@
-import * as Koa from 'koa';
-import * as logger from 'koa-logger';
-import * as koaBody from 'koa-body';
+import Koa = require('koa');
+import logger = require('koa-logger');
+import koaBody = require('koa-body');
 import { ApiServer } from '../../../idw2c';
 
 export const apiInventory = {};
@@ -13,34 +13,70 @@ export const run = (apiName: string) => {
     app.use(logger());
     app.use(koaBody());
 
-    const apis = ApiServer.registry[apiName];
-    if (!apis) {
+    const listener = ApiServer.registry.get(apiName);
+    if (!listener) {
         throw new Error(`No APIs found for ${apiName} in ${JSON.stringify(ApiServer.registry)}`);
     }
 
-    apis.apis.map(api => ({
-        api,
+    const pathArg = new RegExp(/{(?<key>[0-9a-zA-Z]+)}/);
+    const matchPath = (path: string, pathSpec: string) => {
+        const specParts = pathSpec.split('/');
+        const pathParts = path.split('/');
+
+        if (specParts.length !== pathParts.length) {
+            return;
+        }
+
+        const parsed = specParts.map((v, idx) => {
+            const arg = pathArg.exec(v);
+            if (arg) {
+                return {
+                    [arg.groups?.key || 'BADKEY']: pathParts[idx]
+                };
+            } else {
+                return v === pathParts[idx];
+            }
+        });
+
+        if (!parsed.every(v => !!v)) {
+            return;
+        }
+
+        return parsed
+            .filter(el => typeof el !== 'boolean')
+            .map(el => el as Record<string, string>)
+            .reduce((sofar, curr) => ({
+                ...sofar,
+                ...curr
+            }), {});
+    }
+
+    listener.apis.map(apiDef => ({
+        apiDef,
         middleware: async (ctx: Koa.Context, next: Koa.Next) => {
-            if (ctx.path !== api.spec.path) {
+            const pathMatcher = matchPath(ctx.path, apiDef.spec.path);
+            if (!pathMatcher) {
                 return await next();
             }
 
-            if (ctx.request.method !== api.spec.method) {
+            if (ctx.request.method !== apiDef.spec.method) {
                 return await next();
             }
 
             ctx.type = 'application/json';
-            ctx.body = api.api.run(ctx.request.body);
+            ctx.body = await apiDef.api.exec({
+                ...pathMatcher,
+                ...ctx.request.body
+            });
         }
-    })).map(({ api, middleware }) => {
-        console.log('registering', apiName, JSON.stringify(api));
+    })).map(({ apiDef, middleware }) => {
+        console.log('registering', apiName, JSON.stringify(apiDef));
         app.use(middleware);
-
     });
 
     app.on('error', err => {
         console.error('server error', err)
     });
 
-    app.listen(Number(process.env.SERVER_PORT) || apis.port);
+    app.listen(Number(process.env.SERVER_PORT) || listener.port);
 };

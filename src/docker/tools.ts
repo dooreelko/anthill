@@ -14,3 +14,9 @@ export const findBuildContextRoot = () => {
 
     throw new Error(`Failed detecting docker build root, because could not find package.json while iterating from ${startPath} and up.`);
 };
+
+export type DockerServerInit = {
+    name: string;
+    port: number;
+    host?: string;
+};
