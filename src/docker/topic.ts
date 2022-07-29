@@ -45,6 +45,7 @@ export class DockerTopic<T extends Object> implements maxim.Topic<T> {
     });
 
     private _publish = (elem: T) => {
+        console.log('Got new message!', elem);
         this.theSubs.map(sub => sub.exec(elem));
     }
 

@@ -98,6 +98,7 @@ export const taskStateFunction = new Func<ContainerStateEvent, void>({
 
         // not all images will be managed by us
         if (!task) {
+            console.log('event', e, 'is not ours');
             return;
         }
 
@@ -111,3 +112,7 @@ export const taskStateFunction = new Func<ContainerStateEvent, void>({
         taskStateTopic.instance.publish.exec(task);
     }
 });
+
+export const whenLazyInitialised = () => {
+    containerStateTopic.instance.subscribe.exec(taskStateFunction);
+};

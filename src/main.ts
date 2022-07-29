@@ -14,5 +14,7 @@ export const build = () => {
 
     buildLocal(stack);
 
+    console.error('Solution built. Ready to rumble.');
+
     return app;
 }

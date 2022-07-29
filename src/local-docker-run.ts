@@ -103,25 +103,15 @@ export const build = (stack: TerraformStack) => {
         }
     });
 
-    const net = new Network(stack, 'network', {
-        name: 'local-net'
-    });
-
     [taskQueue, taskStore, containerTopic, taskTopic, dockerist, mainApi]
         .map(el => {
             const { server, serverPath } = buildApiServer(stack, el.init.name);
 
-            new Container(stack, el.init.name, {
+            const cont = new Container(stack, el.init.name, {
                 dependsOn: [server],
                 name: el.init.name,
                 image: server.latest,
                 attach: false,
-                networksAdvanced: [
-                    {
-                        name: net.name,
-                        ipv4Address: el.init.host
-                    }
-                ],
                 ports: [{
                     external: el.init.port,
                     internal: el.init.port
@@ -138,7 +128,9 @@ export const build = (stack: TerraformStack) => {
                     el.apiName
                 ]
             });
-        });
 
-    console.error('Stack built. Ready to synth.');
+            new TerraformOutput(stack, `${el.init.name}-id`, {
+                value: cont.id
+            });
+        });
 }

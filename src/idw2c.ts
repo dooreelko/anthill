@@ -71,7 +71,7 @@ export class Func<TIn = undefined, TOut = void>  {
 
 export type ApiContext = {
     path: string;
-    method: 'GET' | 'POST' | 'PUT' | 'OPTIONS' | 'DELETE'
+    method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'OPTIONS' | 'DELETE'
 };
 
 type ApiServerListener = {

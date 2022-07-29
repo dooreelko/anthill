@@ -6,6 +6,11 @@ import { findBuildContextRoot } from "../tools";
 import { apiServerPath } from './app/main';
 import * as maxim from '../../idw2c';
 
+export const methodWithBody = (method: maxim.ApiContext['method']) =>
+    method === 'GET'
+    || method === 'HEAD'
+    || method === 'OPTIONS';
+
 export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
     exec(arg: TIn): Promise<TOut> {
         const listener = maxim.ApiServer.getListenerByApiName(this.uid);
@@ -16,7 +21,10 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
         }
 
         return fetch(new URL(thisDef.spec.path, `http://${listener.host}:${listener.port}`).href, {
-            body: JSON.stringify(arg)
+            method: thisDef.spec.method,
+            ...(
+                !methodWithBody(thisDef.spec.method) ? {} : { body: JSON.stringify(arg) }
+            )
         })
             .then(r => r.json())
             .then(r => r as TOut);
@@ -39,7 +47,7 @@ export const build = (stack: TerraformStack, name: string) => {
     return {
         server,
         serverPath: path
-            .relative(contextRoot, apiServerPath)
+            .relative(path.join(contextRoot, 'dist'), apiServerPath)
             .replace(path.extname(apiServerPath), '')
     };
 };
