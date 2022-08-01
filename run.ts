@@ -1,17 +1,21 @@
+import { runtimeRegistry } from "./src/anthill/runtime";
 import { whenLazyInitialised } from "./src/architecture";
 import { build } from "./src/main";
 
 build();
-whenLazyInitialised();
+// whenLazyInitialised();
 
-if (process.argv.length < 3) {
+if (process.argv.length < 2) {
     console.error(`Missing script to run argument (and params) in ${JSON.stringify(process.argv)}`);
     process.exit(1);
 }
 
-const scriptToRun = process.argv[2];
-const scriptArgs = process.argv.slice(3);
+const runtimeToRun = process.argv[2];
 
-const runner = require(`./${scriptToRun}`).run as (...args: string[]) => void;
+const runtime = runtimeRegistry.get(runtimeToRun);
+if (!runtime) {
+    console.error(`Runtime registry has no entry for ${runtimeToRun} from ${JSON.stringify(process.argv)}`);
+    process.exit(1);
+}
 
-runner(...scriptArgs);
+runtime();

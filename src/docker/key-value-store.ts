@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
-import * as maxim from '../idw2c';
+import * as maxim from '../anthill/main';
 import { HttpApi } from './api-server/api-server';
+import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
 export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = { id?: TKey }> implements maxim.KeyValueStore<TKey, T> {
@@ -9,7 +10,7 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
     get apiName() { return `kv-${this.init.name}`; }
 
     constructor(public readonly init: DockerServerInit) {
-        new maxim.ApiServer({
+        const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',
@@ -45,7 +46,9 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
                     },
                 ]
             }
-        });
+        };
+
+        new maxim.ApiServer(server, () => run(server));
     }
 
     _list = () => Object.values(this.theStore) as T[];

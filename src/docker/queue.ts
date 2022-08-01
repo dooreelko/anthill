@@ -1,5 +1,6 @@
-import * as maxim from '../idw2c';
+import * as maxim from '../anthill/main';
 import { HttpApi } from './api-server/api-server';
+import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
 export class DockerQueue<T extends Object> implements maxim.Queue<T> {
@@ -8,7 +9,7 @@ export class DockerQueue<T extends Object> implements maxim.Queue<T> {
     get apiName() { return `queue-${this.init.name}`; }
 
     constructor(public readonly init: DockerServerInit) {
-        new maxim.ApiServer({
+        const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',
@@ -30,7 +31,9 @@ export class DockerQueue<T extends Object> implements maxim.Queue<T> {
                     },
                 ]
             }
-        });
+        };
+
+        new maxim.ApiServer(server, () => run(server));
     }
 
     private _put = (elem: T) => {

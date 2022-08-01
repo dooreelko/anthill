@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { runtimeRegistry } from "./runtime";
 
 export class Lazy<T> {
     private _instance?: T;
@@ -28,6 +29,10 @@ export class Api<TIn, TOut> {
     }
 
     exec(arg: TIn): TOut | Promise<TOut> {
+        throw new Error('Remote Api execution not implemented, apparently.');
+    }
+
+    localExec(arg: TIn): TOut | Promise<TOut> {
         const target = this.init.target;
         if (target instanceof Func) {
             return target.init.code(arg);
@@ -74,7 +79,7 @@ export type ApiContext = {
     method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'OPTIONS' | 'DELETE'
 };
 
-type ApiServerListener = {
+export type ApiServerListener = {
     host: string;
     port: number;
     apis: {
@@ -83,13 +88,13 @@ type ApiServerListener = {
     }[];
 };
 
-type ApiServerProps = {
+export type ApiServerProps = {
     name: string;
     listener: ApiServerListener;
 };
 
 export class ApiServer {
-    static registry = new Map<string, ApiServerListener>;
+    static registry = new Map<string, ApiServerProps>;
     static endpointRegistry = new Map<string, string>;
 
     static getListenerByApiName = (uid: string) => {
@@ -102,17 +107,18 @@ export class ApiServer {
             throw new Error(`No api registered for ${entry} from uid ${uid} api.`);
         }
 
-        const listener = this.registry.get(entry);
+        const props = this.registry.get(entry);
 
-        if (!listener) {
+        if (!props) {
             throw new Error(`Failed finding listener for ${uid}`);
         }
 
-        return listener;
+        return props.listener;
     }
 
-    constructor(public props: ApiServerProps) {
-        ApiServer.registry.set(props.name, props.listener);
+    constructor(public props: ApiServerProps, runner: () => void) {
+        runtimeRegistry.set(props.name, runner)
+        ApiServer.registry.set(props.name, props);
         props.listener.apis
             .map(def => ({ id: def.api.uid, apiName: props.name }))
             .map(({ id, apiName }) => ApiServer.endpointRegistry.set(id, apiName));

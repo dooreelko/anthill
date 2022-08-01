@@ -1,5 +1,6 @@
-import * as maxim from '../idw2c';
+import * as maxim from '../anthill/main';
 import { HttpApi } from './api-server/api-server';
+import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
 export class DockerTopic<T extends Object> implements maxim.Topic<T> {
@@ -8,8 +9,7 @@ export class DockerTopic<T extends Object> implements maxim.Topic<T> {
     get apiName() { return `topic-${this.init.name}`; }
 
     constructor(public readonly init: DockerServerInit) {
-
-        new maxim.ApiServer({
+        const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',
@@ -31,7 +31,9 @@ export class DockerTopic<T extends Object> implements maxim.Topic<T> {
                     },
                 ]
             }
-        });
+        };
+
+        new maxim.ApiServer(server, () => run(server));
     }
 
     private _subscribe = (input: maxim.Api<T, void> | maxim.Func<T, void>) => {

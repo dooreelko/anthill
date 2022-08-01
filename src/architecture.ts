@@ -6,7 +6,7 @@ import {
     Lazy, DockerStates, Queue, KeyValueStore,
     Autoscaler, Topic, ContainerStateEvent, ContainerRuntime,
     Func, Api, TaskUid, QueuePoller, ApiServer
-} from "./idw2c";
+} from "./anthill/main";
 
 export type Task = {
     // id of the task in the store
@@ -98,7 +98,7 @@ export const taskStateFunction = new Func<ContainerStateEvent, void>({
 
         // not all images will be managed by us
         if (!task) {
-            console.log('event', e, 'is not ours');
+            console.error('event', e, 'is not ours');
             return;
         }
 

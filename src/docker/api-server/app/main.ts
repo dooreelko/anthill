@@ -1,22 +1,19 @@
 import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
-import { ApiServer } from '../../../idw2c';
+import { ApiServerProps } from '../../../anthill/main';
 
 export const apiInventory = {};
 
 export const apiServerPath = __filename;
 
-export const run = (apiName: string) => {
+export const run = (server: ApiServerProps) => {
     const app = new Koa();
 
     app.use(logger());
     app.use(koaBody());
 
-    const listener = ApiServer.registry.get(apiName);
-    if (!listener) {
-        throw new Error(`No APIs found for ${apiName} in ${JSON.stringify(ApiServer.registry)}`);
-    }
+    const { listener, name } = server;
 
     const pathArg = new RegExp(/{(?<key>[0-9a-zA-Z]+)}/);
     const matchPath = (path: string, pathSpec: string) => {
@@ -64,13 +61,15 @@ export const run = (apiName: string) => {
             }
 
             ctx.type = 'application/json';
-            ctx.body = await apiDef.api.exec({
+            ctx.body = await apiDef.api.localExec({
                 ...pathMatcher,
                 ...ctx.request.body
             });
+
+            console.error('response for ', apiDef.spec.path, 'is', ctx.body);
         }
     })).map(({ apiDef, middleware }) => {
-        console.log('registering', apiName, JSON.stringify(apiDef));
+        console.log('registering', name, JSON.stringify(apiDef));
         app.use(middleware);
     });
 

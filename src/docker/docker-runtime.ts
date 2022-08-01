@@ -1,9 +1,10 @@
 import Docker = require('dockerode');
 import JSONStream = require('pixl-json-stream');
 import { EventEmitter } from 'stream';
-import * as maxim from '../idw2c';
-import { DockerRun } from '../idw2c';
+import * as maxim from '../anthill/main';
+import { DockerRun } from '../anthill/main';
 import { HttpApi } from './api-server/api-server';
+import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
 export type DockerEvent = {
@@ -30,7 +31,7 @@ export class DockerRuntime extends maxim.ContainerRuntime {
     constructor(public readonly init: maxim.ContainerRuntimeInit & DockerServerInit) {
         super(init);
 
-        new maxim.ApiServer({
+        const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',
@@ -45,6 +46,11 @@ export class DockerRuntime extends maxim.ContainerRuntime {
                     }
                 ]
             }
+        };
+
+        new maxim.ApiServer(server, () => {
+            this.startListening();
+            run(server);
         });
     }
 
