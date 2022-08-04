@@ -1,4 +1,6 @@
+import { subOperation } from "cdktf";
 import { randomUUID } from "crypto";
+import { Gradual, Graduate } from "./gradual";
 import { runtimeRegistry } from "./runtime";
 
 export class Lazy<T> {
@@ -47,6 +49,7 @@ export class Api<TIn, TOut> {
     localExec(arg: TIn): TOut | Promise<TOut> {
         const target = this.init.target;
         if (target instanceof Func) {
+            console.log('running local', target);
             return target.init.code(arg);
         }
 
@@ -80,51 +83,17 @@ export interface ITopic<T> {
     publish: Api<T, void>;
 }
 
-export class ArchTopic<T> {
-    public readonly theSubs: (Api<T, void> | Func<T, void>)[] = [];
+export class ArchTopic<T> implements Partial<ITopic<T>> {
+    theSubs = [] as (Api<T, void> | Func<T, void>)[];
 
     subscribe = new Api<Api<T, void> | Func<T, void>, void>({
         target: new Func({
             code: (dest: Api<T, void> | Func<T, void>) => { this.theSubs.push(dest) }
         })
-    });
+    })
 }
 
-export class ProxyTopic<T> implements ITopic<T> {
-    private implementations: Partial<ITopic<T>>[] = [];
-
-    constructor(init?: Partial<ITopic<T>>) {
-        if (init) {
-            this.implementations.push(init);
-        }
-
-        return new Proxy(this, {
-            get(target: ProxyTopic<T>, p: string | symbol, receiver: any): any {
-                // console.error('getting', p, 'from', target);
-                const impl = target.implementations.find(el => Object.hasOwn(el, p)) || target;
-                // console.error('got', impl);
-                if (!impl) {
-                    throw new Error(`Implementation for '${String(p)}' has not been provided yet.`);
-                }
-
-                return (impl as any)[p];
-            }
-        });
-    }
-
-    extend(whatWith: Partial<ITopic<T>>): void {
-        this.implementations = [
-            whatWith,
-            ...this.implementations,
-        ];
-    }
-
-    readonly theSubs: (Api<T, void> | Func<T, void>)[] = [];
-
-    subscribe = notImplementedApi<Api<T, void> | Func<T, void>>();
-
-    publish = notImplementedApi<T>();
-};
+export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
 export interface KeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
     list: Api<void, T[]>;
@@ -228,3 +197,5 @@ export abstract class ContainerRuntime {
 
     abstract run: Api<DockerRun, TaskUid>;
 };
+
+export * from './gradual';
