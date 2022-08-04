@@ -19,6 +19,18 @@ export class Lazy<T> {
     };
 }
 
+export class Buildup<T extends object> implements ProxyHandler<T> {
+    private instanceSofar: Partial<T> = {};
+    constructor(initialParts?: Partial<T>) {
+        this.instanceSofar = { ...initialParts };
+    }
+
+    apply?(target: T, thisArg: any, argArray: any[]): any {
+
+    }
+
+}
+
 export class Api<TIn, TOut> {
     public readonly uid: string;
 
@@ -54,9 +66,64 @@ export class QueuePoller<T> {
     }) { };
 };
 
-export interface Topic<T> {
+export const notImplementedApi = <T>() => new Api<T, void>({
+    target: new Func({
+        code: (dest: T) => { throw new Error('This API has no implementation yet.') }
+    })
+});
+
+export interface ITopic<T> {
+    readonly theSubs: (Api<T, void> | Func<T, void>)[];
+
     subscribe: Api<Api<T, void> | Func<T, void>, void>;
+
     publish: Api<T, void>;
+}
+
+export class ArchTopic<T> {
+    public readonly theSubs: (Api<T, void> | Func<T, void>)[] = [];
+
+    subscribe = new Api<Api<T, void> | Func<T, void>, void>({
+        target: new Func({
+            code: (dest: Api<T, void> | Func<T, void>) => { this.theSubs.push(dest) }
+        })
+    });
+}
+
+export class ProxyTopic<T> implements ITopic<T> {
+    private implementations: Partial<ITopic<T>>[] = [];
+
+    constructor(init?: Partial<ITopic<T>>) {
+        if (init) {
+            this.implementations.push(init);
+        }
+
+        return new Proxy(this, {
+            get(target: ProxyTopic<T>, p: string | symbol, receiver: any): any {
+                // console.error('getting', p, 'from', target);
+                const impl = target.implementations.find(el => Object.hasOwn(el, p)) || target;
+                // console.error('got', impl);
+                if (!impl) {
+                    throw new Error(`Implementation for '${String(p)}' has not been provided yet.`);
+                }
+
+                return (impl as any)[p];
+            }
+        });
+    }
+
+    extend(whatWith: Partial<ITopic<T>>): void {
+        this.implementations = [
+            whatWith,
+            ...this.implementations,
+        ];
+    }
+
+    readonly theSubs: (Api<T, void> | Func<T, void>)[] = [];
+
+    subscribe = notImplementedApi<Api<T, void> | Func<T, void>>();
+
+    publish = notImplementedApi<T>();
 };
 
 export interface KeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
@@ -148,7 +215,7 @@ export type TaskUid = string;
 
 export type ContainerRuntimeInit = {
     autoscaler: Autoscaler;
-    stateChangeTopic: Topic<ContainerStateEvent>;
+    stateChangeTopic: ITopic<ContainerStateEvent>;
 };
 
 export type DockerRun = {
