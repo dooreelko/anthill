@@ -2,6 +2,7 @@ import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
 import { ApiServerProps } from '../../../anthill/main';
+import { networkIpamConfigToTerraform } from '@cdktf/provider-docker';
 
 export const apiInventory = {};
 
@@ -10,8 +11,15 @@ export const apiServerPath = __filename;
 export const run = (server: ApiServerProps) => {
     const app = new Koa();
 
-    app.use(logger());
-    app.use(koaBody());
+    app.use((ctx: Koa.Context, next: Koa.Next) => {
+        console.log('rq', ctx);
+        return next();
+    });
+    app.use(logger((str, args) => console.log(server.name, str, args)));
+    app.use(koaBody({
+        text: false,
+        includeUnparsed: true
+    }));
 
     const { listener, name } = server;
 
@@ -59,6 +67,8 @@ export const run = (server: ApiServerProps) => {
             if (ctx.request.method !== apiDef.spec.method) {
                 return await next();
             }
+
+            console.log('matched to ', apiDef.api, 'will use body of', ctx);
 
             ctx.type = 'application/json';
             ctx.body = await apiDef.api.localExec({

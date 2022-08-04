@@ -9,7 +9,11 @@ node .
 
 (cd cdktf.out/stacks/dorc-implmementation/ && terraform init && terraform apply -auto-approve )
 
-curl localhost:8080/v1/tasks -vvv &
+seep 5
+
+curl localhost:8080/v1/tasks -vvv 
+
+curl localhost:8080/v1/task -vvv --data '{"image": "ubuntu", "cmd": ["echo", "ok"]}' -X POST | jq 
 
 docker ps --format '{{ json .}}' \
     | jq -r .Names \

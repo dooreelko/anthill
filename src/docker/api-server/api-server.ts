@@ -8,6 +8,8 @@ export const methodWithBody = (method: maxim.ApiContext['method']) =>
     && method !== 'HEAD'
     && method !== 'OPTIONS';
 
+export const stringifyOnDemand = (arg: unknown) => typeof arg === 'string' ? arg : JSON.stringify(arg);
+
 export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
     exec(arg: TIn): Promise<TOut> {
         const listener = maxim.ApiServer.getListenerByApiName(this.uid);
@@ -20,7 +22,12 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
         const fetchInit = {
             method: thisDef.spec.method,
             ...(
-                !methodWithBody(thisDef.spec.method) ? {} : { body: JSON.stringify(arg) }
+                !methodWithBody(thisDef.spec.method) ? {} : {
+                    body: stringifyOnDemand(arg),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
             )
         };
         console.log('calling api', this.init, listener, thisDef, fetchInit);

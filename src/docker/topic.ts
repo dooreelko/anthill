@@ -3,12 +3,14 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DockerTopic<T extends Object> implements maxim.Topic<T> {
-    private theSubs = [] as (maxim.Api<T, void> | maxim.Func<T, void>)[];
-
+export class DockerTopic<T extends Object> extends maxim.ArchTopic<T> {
     get apiName() { return `topic-${this.init.name}`; }
 
-    constructor(public readonly init: DockerServerInit) {
+    constructor(public readonly init: DockerServerInit & { parent: maxim.ProxyTopic<T> }) {
+        super();
+
+        init.parent.extend(this);
+
         const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {
@@ -37,7 +39,7 @@ export class DockerTopic<T extends Object> implements maxim.Topic<T> {
     }
 
     private _subscribe = (input: maxim.Api<T, void> | maxim.Func<T, void>) => {
-        this.theSubs.push(input);
+        this.init.parent.theSubs.push(input);
     };
 
     subscribe = new HttpApi({
@@ -48,7 +50,7 @@ export class DockerTopic<T extends Object> implements maxim.Topic<T> {
 
     private _publish = (elem: T) => {
         console.log('Got new message!', elem);
-        this.theSubs.map(sub => sub.exec(elem));
+        this.init.parent.theSubs.map(sub => sub.exec(elem));
     }
 
     publish = new HttpApi({

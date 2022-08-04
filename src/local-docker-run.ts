@@ -40,18 +40,20 @@ export const build = (stack: TerraformStack) => {
     arch.taskStore.instance = taskStore;
 
     const containerTopic = new DockerTopic<ContainerStateEvent>({
+        parent: arch.containerStateTopic,
         name: 'container-topic',
         port: 8002,
         host: '127.0.0.1'
     });
-    arch.containerStateTopic.instance = containerTopic;
+    // arch.containerStateTopic.extend(containerTopic);
 
     const taskTopic = new DockerTopic<arch.Task>({
+        parent: arch.taskStateTopic,
         name: 'task-topic',
         port: 8003,
         host: '127.0.0.1'
     });
-    arch.taskStateTopic.instance = taskTopic;
+    // arch.taskStateTopic.extend(taskTopic);
 
     arch.scaler.instance = new DummyAutoscaler();
 

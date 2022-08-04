@@ -1,5 +1,5 @@
 import { runtimeRegistry } from "./src/anthill/runtime";
-import { whenLazyInitialised } from "./src/architecture";
+// import { whenLazyInitialised } from "./src/architecture";
 import { build } from "./src/main";
 
 build();
