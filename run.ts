@@ -1,9 +1,7 @@
 import { runtimeRegistry } from "./src/anthill/runtime";
-// import { whenLazyInitialised } from "./src/architecture";
 import { build } from "./src/main";
 
 build();
-// whenLazyInitialised();
 
 if (process.argv.length < 2) {
     console.error(`Missing script to run argument (and params) in ${JSON.stringify(process.argv)}`);

@@ -49,7 +49,6 @@ export class Api<TIn, TOut> {
     localExec(arg: TIn): TOut | Promise<TOut> {
         const target = this.init.target;
         if (target instanceof Func) {
-            console.log('running local', target);
             return target.init.code(arg);
         }
 

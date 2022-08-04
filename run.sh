@@ -9,12 +9,14 @@ node .
 
 (cd cdktf.out/stacks/dorc-implmementation/ && terraform init && terraform apply -auto-approve )
 
-seep 5
+sleep 5
 
-curl localhost:8080/v1/tasks -vvv 
-
-curl localhost:8080/v1/task -vvv --data '{"image": "ubuntu", "cmd": ["echo", "ok"]}' -X POST | jq 
+curl localhost:8080/v1/task -vvv \
+    --data '{"image": "ubuntu", "cmd": ["echo", "ok"]}' \
+    --request POST --header "Content-Type: application/json" | jq
 
 docker ps --format '{{ json .}}' \
     | jq -r .Names \
-    | xargs -I{} bash -c 'echo {}; docker logs {}'
+    | xargs -I{} bash -c 'echo === {} ===; docker logs {}'
+
+curl localhost:8080/v1/tasks -vvv 

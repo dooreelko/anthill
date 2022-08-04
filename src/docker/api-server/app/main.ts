@@ -2,7 +2,6 @@ import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
 import { ApiServerProps } from '../../../anthill/main';
-import { networkIpamConfigToTerraform } from '@cdktf/provider-docker';
 
 export const apiInventory = {};
 
@@ -11,15 +10,12 @@ export const apiServerPath = __filename;
 export const run = (server: ApiServerProps) => {
     const app = new Koa();
 
-    app.use((ctx: Koa.Context, next: Koa.Next) => {
-        console.log('rq', ctx);
-        return next();
-    });
-    app.use(logger((str, args) => console.log(server.name, str, args)));
     app.use(koaBody({
         text: false,
-        includeUnparsed: true
+        includeUnparsed: false
     }));
+
+    app.use((ctx: Koa.Context, next: Koa.Next) => logger((str) => console.log(server.name, str, ctx.request.body || '[nobody]', ' ==>', ctx.response.body || '[nobody]'))(ctx, next));
 
     const { listener, name } = server;
 
@@ -68,13 +64,20 @@ export const run = (server: ApiServerProps) => {
                 return await next();
             }
 
-            console.log('matched to ', apiDef.api, 'will use body of', ctx);
+            // console.log('matched to ', apiDef.api, 'will use body of', ctx);
+            console.log('matched to ', apiDef.api);
 
-            ctx.type = 'application/json';
-            ctx.body = await apiDef.api.localExec({
-                ...pathMatcher,
-                ...ctx.request.body
-            });
+            try {
+                ctx.body = await apiDef.api.localExec({
+                    ...pathMatcher,
+                    ...ctx.request.body
+                });
+                ctx.type = 'application/json';
+            } catch (e) {
+                console.error('Error calling local api', e);
+                ctx.response.status = 500;
+                ctx.body = JSON.stringify(e);
+            }
 
             console.error('response for ', apiDef.spec.path, 'is', ctx.body);
         }
@@ -84,8 +87,9 @@ export const run = (server: ApiServerProps) => {
     });
 
     app.on('error', err => {
-        console.error('server error', err)
+        console.error('Server error', err)
     });
 
     app.listen(Number(process.env.SERVER_PORT) || listener.port);
+    console.log('Server', server.name, listener.host, listener.port);
 };

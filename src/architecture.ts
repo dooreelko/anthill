@@ -5,7 +5,7 @@
 import {
     Lazy, DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
-    Func, Api, TaskUid, QueuePoller, ApiServer, ProxyTopic, ArchTopic
+    Func, Api, TaskUid, QueuePoller, ApiServer, Topic
 } from "./anthill/main";
 
 export type Task = {
@@ -29,9 +29,11 @@ export const taskStore = new Lazy<KeyValueStore<string, Task>>();
 
 export const scaler = new Lazy<Autoscaler>();
 
-export const containerStateTopic = new ProxyTopic<ContainerStateEvent>(new ArchTopic<ContainerStateEvent>());
+const ContainerStateEventTopic = Topic<ContainerStateEvent>();
+export const containerStateTopic = new ContainerStateEventTopic();
 
-export const taskStateTopic = new ProxyTopic<Task>(new ArchTopic<Task>());
+const TaskTopic = Topic<Task>();
+export const taskStateTopic = new TaskTopic();
 
 export const containerRuntime = new Lazy<ContainerRuntime>();
 
@@ -113,5 +115,4 @@ export const taskStateFunction = new Func<ContainerStateEvent, void>({
     }
 });
 
-console.log(containerStateTopic.subscribe);
 containerStateTopic.subscribe.localExec(taskStateFunction);

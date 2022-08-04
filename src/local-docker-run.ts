@@ -45,6 +45,7 @@ export const build = (stack: TerraformStack) => {
         port: 8002,
         host: '127.0.0.1'
     });
+
     // arch.containerStateTopic.extend(containerTopic);
 
     const taskTopic = new DockerTopic<arch.Task>({
@@ -62,7 +63,7 @@ export const build = (stack: TerraformStack) => {
         port: 8004,
         host: '127.0.0.1',
         autoscaler: new DummyAutoscaler(),
-        stateChangeTopic: containerTopic
+        stateChangeTopic: arch.containerStateTopic
     });
     arch.containerRuntime.instance = dockerist;
 

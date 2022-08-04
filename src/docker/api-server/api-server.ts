@@ -30,10 +30,10 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
                 }
             )
         };
-        console.log('calling api', this.init, listener, thisDef, fetchInit);
+        console.log('Calling api', (listener as any).name || listener, thisDef.spec.path, fetchInit.body);
 
         return fetch(new URL(thisDef.spec.path, `http://${listener.host}:${listener.port}`).href, fetchInit)
-            .then(r => r.json())
+            .then(r => r.status !== 204 && r.json())
             .then(r => r as TOut)
             .then(r => {
                 console.error('Success calling API', thisDef.spec.path, r);

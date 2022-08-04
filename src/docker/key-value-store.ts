@@ -51,7 +51,8 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         new maxim.ApiServer(server, () => run(server));
     }
 
-    _list = () => Object.values(this.theStore) as T[];
+    _list = () => [...this.theStore.values()];
+
 
     _get = (criteria: TKey | Partial<T>) => {
         if (typeof criteria === 'string') {

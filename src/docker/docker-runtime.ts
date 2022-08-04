@@ -75,7 +75,7 @@ export class DockerRuntime extends maxim.ContainerRuntime {
                     exitCode: Number(j.Actor.Attributes['exitCode']) || -1,
                     status: state.State.Status as maxim.DockerStates
                 })
-                console.log(j);
+                console.log('Docker event', j);
             });
         }).catch(err => {
             console.error('Failed connecting to the docker events. Aborting.', err);

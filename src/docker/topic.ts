@@ -3,12 +3,10 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DockerTopic<T extends Object> extends maxim.ArchTopic<T> {
+export class DockerTopic<T extends Object> implements Partial<maxim.ITopic<T>> {
     get apiName() { return `topic-${this.init.name}`; }
 
-    constructor(public readonly init: DockerServerInit & { parent: maxim.ProxyTopic<T> }) {
-        super();
-
+    constructor(public readonly init: DockerServerInit & { parent: maxim.ITopic<T> & maxim.Extendo<maxim.ITopic<T>> }) {
         init.parent.extend(this);
 
         const server: maxim.ApiServerProps = {
