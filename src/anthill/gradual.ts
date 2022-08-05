@@ -1,7 +1,27 @@
+/**
+ * THIS IS WHERE THE DIRTY LAUNDRY IS. LOOK AWAY.
+ */
+
 export type PartialThingOrFunc<T> = Partial<T>;
 
 export type Extendo<T> = {
-    extend(whatWith: Partial<T>): void;
+    extend<Sub extends Partial<T>>(whatWith: Sub): Sub;
+}
+
+export class Selfed<T> {
+    protected _self?: T;
+
+    set self(newVal: T) {
+        this._self = newVal;
+    }
+
+    get self(): T {
+        if (!this._self) {
+            throw new Error('This class has no self yet');
+        }
+
+        return this._self;
+    }
 }
 
 /**
@@ -16,15 +36,33 @@ export class Gradual<T> {
             this.implementations = impls;
         }
 
-        return new Proxy(this, {
-            get(target: Gradual<T>, p: string | symbol, receiver: any): any {
-                // console.error('getting', p, 'from', target);
-                const impl = target.implementations.find(el => Object.hasOwn(el, p)) || target;
-                // console.error('got', impl);
-                if (!impl) {
-                    throw new Error(`Implementation for '${String(p)}' has not been provided yet.`);
+        return new Proxy({
+            implementations: impls,
+            extend(whatWith: Partial<T> & { self: T }): T {
+                this.implementations = [
+                    whatWith,
+                    ...this.implementations,
+                ];
+
+                whatWith.self = this as unknown as T;
+
+                return this as unknown as T;
+            }
+        }, {
+            get(target: Gradual<T>, p: string, receiver: any): any {
+                // console.error('getting', p, 'from', target, target.implementations);
+                const extraImpl = target.implementations.find(el => new Set(Object.keys(el)).has(p) || !!(el as any)[p]);
+
+                const ownKeys = new Set(Object.keys(target));
+                const ownImpl = ownKeys.has(p) ? target : undefined;
+
+                if (!extraImpl && !ownImpl) {
+                    throw new Error(`Implementation for '${String(p)}' has not been provided yet. Neither in the self (${JSON.stringify(ownKeys)})`);
                 }
 
+                const impl = extraImpl || ownImpl;
+
+                // console.error('got', extraImpl, (impl as any)[p]);
                 return (impl as any)[p];
             }
         });
@@ -34,15 +72,12 @@ export class Gradual<T> {
      * Add a partial implementation. The new one will take priority over existing.
      * @param whatWith additional partial implementation
      */
-    extend(whatWith: Partial<T>): void {
-        this.implementations = [
-            whatWith,
-            ...this.implementations,
-        ];
+    extend(whatWith: Partial<T> & { self: T }): T {
+        return this as unknown as T;
     }
 };
 
-export const Graduate = <T>(...arg: Partial<T>[]) => new Proxy<{}>({}, {
+export const Graduate = <T>(...arg: Partial<T>[]) => new Proxy<{}>(Gradual, {
     construct: () => {
         return new Gradual<T>(...arg);
     }

@@ -5,67 +5,48 @@ import { Container, DockerProvider, Image, Network } from "@cdktf/provider-docke
 import { apiServerBuildContext } from './docker/api-server/api-server';
 import { DockerQueue } from './docker/queue';
 import { DockerKeyValueStore } from './docker/key-value-store';
-import { ApiServer, ApiServerProps, Autoscaler, ContainerStateEvent } from './anthill/main';
+import { ApiServer, ApiServerProps, ContainerStateEvent, IAutoscaler, IContainerRuntime } from './anthill/main';
 import { DockerTopic } from './docker/topic';
-import { DockerRuntime } from './docker/docker-runtime';
+import { DockerRuntime, DummyAutoscaler } from './docker/docker-runtime';
 import { run } from './docker/api-server/app/main';
-
-export class DummyAutoscaler extends Autoscaler {
-    get nodeCount(): number {
-        return 1;
-    }
-    set nodeCount(newCount: number) {
-
-    }
-    get idleNodeCount(): number {
-        return 1;
-    }
-};
 
 export const build = (stack: TerraformStack) => {
     new DockerProvider(stack, "docker", {});
 
-    const taskQueue = new DockerQueue<arch.Task>({
+    const taskQueue = arch.taskQueue.extend(new DockerQueue<arch.Task>({
         name: 'task-queue',
         port: 8000,
         host: '127.0.0.1'
-    });
-    arch.taskQueue.instance = taskQueue;
+    }));
 
-    const taskStore = new DockerKeyValueStore<string, arch.Task>({
+    const taskStore = arch.taskStore.extend(new DockerKeyValueStore<string, arch.Task>({
         name: 'task-store',
         port: 8001,
         host: '127.0.0.1'
-    });
-    arch.taskStore.instance = taskStore;
+    }));
 
-    const containerTopic = new DockerTopic<ContainerStateEvent>({
-        parent: arch.containerStateTopic,
+    const containerTopic = arch.containerStateTopic.extend(new DockerTopic<ContainerStateEvent>({
         name: 'container-topic',
         port: 8002,
         host: '127.0.0.1'
-    });
+    }));
 
-    // arch.containerStateTopic.extend(containerTopic);
-
-    const taskTopic = new DockerTopic<arch.Task>({
-        parent: arch.taskStateTopic,
+    const taskTopic = arch.taskStateTopic.extend(new DockerTopic<arch.Task>({
         name: 'task-topic',
         port: 8003,
         host: '127.0.0.1'
-    });
-    // arch.taskStateTopic.extend(taskTopic);
+    }));
 
-    arch.scaler.instance = new DummyAutoscaler();
+    arch.scaler.extend(new DummyAutoscaler());
 
     const dockerist = new DockerRuntime({
         name: 'docker-run',
         port: 8004,
-        host: '127.0.0.1',
-        autoscaler: new DummyAutoscaler(),
-        stateChangeTopic: arch.containerStateTopic
+        host: '127.0.0.1'
     });
-    arch.containerRuntime.instance = dockerist;
+
+    arch.containerRuntime.extend(dockerist);
+    arch.containerRuntime.autoscaler = new DummyAutoscaler();
 
     const mainApi = {
         apiName: 'dorc',
@@ -120,7 +101,6 @@ export const build = (stack: TerraformStack) => {
     [taskQueue, taskStore, containerTopic, taskTopic, dockerist, mainApi]
         .map(el => {
             const name = `dorc-${el.init.name}`;
-            // const { server, serverPath } = buildApiServer(stack, name);
 
             const cont = new Container(stack, name, {
                 dependsOn: [server],

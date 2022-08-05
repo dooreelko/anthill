@@ -9,7 +9,7 @@
         "post-build": " find ./src -iname '*dockerfile' -exec cp '{}' './dist/{}' ';'",
         "synth": "cdktf synth",
         "compile": "tsc --pretty && npm run post-build",
-        "watch": "tsc -w",
+        "watch": "tsc --watch --pretty && npm run post-build",
         "test": "jest",
         "test:watch": "jest --watch",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",

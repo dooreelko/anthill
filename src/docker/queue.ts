@@ -3,12 +3,14 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DockerQueue<T extends Object> implements maxim.Queue<T> {
+export class DockerQueue<T extends Object> extends maxim.Selfed<maxim.IQueue<T>> implements maxim.IQueue<T> {
     private theQueue = [] as T[];
 
     get apiName() { return `queue-${this.init.name}`; }
 
     constructor(public readonly init: DockerServerInit) {
+        super();
+
         const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {

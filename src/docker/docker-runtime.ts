@@ -7,6 +7,19 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
+export class DummyAutoscaler implements maxim.IAutoscaler {
+    get nodeCount(): number {
+        return 1;
+    }
+    set nodeCount(newCount: number) {
+
+    }
+    get idleNodeCount(): number {
+        return 1;
+    }
+};
+
+
 export type DockerEvent = {
     status: 'start' | 'create' | 'attach' | 'resize' | 'die',
     id: string,
@@ -22,14 +35,14 @@ export type DockerEvent = {
     timeNano: number
 };
 
-export class DockerRuntime extends maxim.ContainerRuntime {
+export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> implements Partial<maxim.IContainerRuntime> {
     private docker = new Docker();
     private listening = false;
 
     get apiName() { return `docker-${this.init.name}`; }
 
-    constructor(public readonly init: maxim.ContainerRuntimeInit & DockerServerInit) {
-        super(init);
+    constructor(public readonly init: DockerServerInit) {
+        super();
 
         const server: maxim.ApiServerProps = {
             name: this.apiName,
@@ -70,7 +83,7 @@ export class DockerRuntime extends maxim.ContainerRuntime {
                 const container = this.docker.getContainer(j.id);
                 const state = await container.inspect();
 
-                this.init.stateChangeTopic.publish.exec({
+                this.self.stateChangeTopic!.publish.exec({
                     uid: this.containerUid(container),
                     exitCode: Number(j.Actor.Attributes['exitCode']) || -1,
                     status: state.State.Status as maxim.DockerStates
@@ -93,7 +106,7 @@ export class DockerRuntime extends maxim.ContainerRuntime {
                 const container = cont as Docker.Container;
                 const exitCode = (await container.inspect()).State.ExitCode;
 
-                await this.init.stateChangeTopic.publish.exec({
+                await this.self.stateChangeTopic!.publish.exec({
                     uid: this.containerUid(container),
                     exitCode,
                     message: String(err),
@@ -102,7 +115,7 @@ export class DockerRuntime extends maxim.ContainerRuntime {
 
                 reject(err);
             }).on('container', async (cont: Docker.Container) => {
-                await this.init.stateChangeTopic.publish.exec({
+                await this.self.stateChangeTopic!.publish.exec({
                     uid: this.containerUid(cont),
                     exitCode: 0,
                     status: 'running'

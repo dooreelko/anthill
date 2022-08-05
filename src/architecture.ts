@@ -3,9 +3,9 @@
 /** DESIGN */
 
 import {
-    Lazy, DockerStates, Queue, KeyValueStore,
+    DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
-    Func, Api, TaskUid, QueuePoller, ApiServer, Topic
+    Func, Api, TaskUid, QueuePoller, Topic
 } from "./anthill/main";
 
 export type Task = {
@@ -23,28 +23,43 @@ export type TaskSubmissionRequest = {
     cmd: string[];
 };
 
-export const taskQueue = new Lazy<Queue<Task>>();
-
-export const taskStore = new Lazy<KeyValueStore<string, Task>>();
-
-export const scaler = new Lazy<Autoscaler>();
-
+// Specialized gradual constructor types
 const ContainerStateEventTopic = Topic<ContainerStateEvent>();
-export const containerStateTopic = new ContainerStateEventTopic();
 
 const TaskTopic = Topic<Task>();
+
+const TaskQueue = Queue<Task>();
+
+const TaskKeyValueStore = KeyValueStore<string, Task>();
+
+const DorcAutoscaler = Autoscaler();
+
+const DorcContainerRuntime = ContainerRuntime();
+
+// Architectural entities
+
+export const taskQueue = new TaskQueue();
+
+export const taskStore = new TaskKeyValueStore();
+
+export const scaler = new DorcAutoscaler();
+
+export const containerStateTopic = new ContainerStateEventTopic();
+
 export const taskStateTopic = new TaskTopic();
 
-export const containerRuntime = new Lazy<ContainerRuntime>();
+export const containerRuntime = new DorcContainerRuntime();
+console.log(containerRuntime, containerRuntime.stateChangeTopic);
+containerRuntime.stateChangeTopic = containerStateTopic;
 
 export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
     code: async (request: TaskSubmissionRequest) => {
-        const task = await taskStore.instance.put.exec({
+        const task = await taskStore.put.exec({
             state: 'queued',
             ...request
         });
 
-        taskQueue.instance.put.exec(task);
+        taskQueue.put.exec(task);
 
         return task;
     }
@@ -58,12 +73,12 @@ export const runTaskFunction = new Func<Task>({
     code: async t => {
         let uid: TaskUid;
         try {
-            uid = await containerRuntime.instance.run.exec(t);
+            uid = await containerRuntime.run.exec(t);
         } catch (e) {
             throw new Error(`Container runtime refused new task with ${e}`);
         }
 
-        taskStore.instance.put.exec({
+        taskStore.put.exec({
             ...t,
             uid,
             state: 'queued'
@@ -77,7 +92,7 @@ export const taskQueuePoller = new QueuePoller<Task>({
 });
 
 export const listTasksFunction = new Func<unknown, Task[]>({
-    code: () => taskStore.instance.list.exec()
+    code: () => taskStore.list.exec()
 });
 
 export const apiListTasks = new Api<unknown, Task[]>({
@@ -85,7 +100,7 @@ export const apiListTasks = new Api<unknown, Task[]>({
 });
 
 export const getTaskFunction = new Func<string, Task | undefined>({
-    code: (id) => taskStore.instance.get.exec(id)
+    code: (id) => taskStore.get.exec(id)
 });
 
 export const apiGetTask = new Api<string, Task | undefined>({
@@ -95,7 +110,6 @@ export const apiGetTask = new Api<string, Task | undefined>({
 export const taskStateFunction = new Func<ContainerStateEvent, void>({
     code: async e => {
         const task = await taskStore
-            .instance
             .get.exec({ uid: e.uid });
 
         // not all images will be managed by us
@@ -105,7 +119,6 @@ export const taskStateFunction = new Func<ContainerStateEvent, void>({
         }
 
         taskStore
-            .instance
             .put.exec({
                 ...task,
                 state: e.status

@@ -4,12 +4,16 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = { id?: TKey }> implements maxim.KeyValueStore<TKey, T> {
+export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = { id?: TKey }>
+    extends maxim.Selfed<maxim.IKeyValueStore<TKey, T>>
+    implements maxim.IKeyValueStore<TKey, T> {
     private theStore = new Map<TKey, T>();
 
     get apiName() { return `kv-${this.init.name}`; }
 
     constructor(public readonly init: DockerServerInit) {
+        super();
+
         const server: maxim.ApiServerProps = {
             name: this.apiName,
             listener: {

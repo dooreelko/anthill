@@ -1,43 +1,12 @@
-import { subOperation } from "cdktf";
 import { randomUUID } from "crypto";
-import { Gradual, Graduate } from "./gradual";
+import { Graduate } from "./gradual";
 import { runtimeRegistry } from "./runtime";
-
-export class Lazy<T> {
-    private _instance?: T;
-
-    constructor(private init?: (inst: T) => void) { }
-
-    get instance(): T {
-        if (!this._instance) {
-            throw new Error(`Lazy instance hasn't been set yet`);
-        }
-        return this._instance;
-    };
-
-    set instance(val: T) {
-        this._instance = val;
-        this.init && this.init(this._instance);
-    };
-}
-
-export class Buildup<T extends object> implements ProxyHandler<T> {
-    private instanceSofar: Partial<T> = {};
-    constructor(initialParts?: Partial<T>) {
-        this.instanceSofar = { ...initialParts };
-    }
-
-    apply?(target: T, thisArg: any, argArray: any[]): any {
-
-    }
-
-}
 
 export class Api<TIn, TOut> {
     public readonly uid: string;
 
     constructor(public readonly init: {
-        target: Func<TIn, TOut> | Queue<TIn>;
+        target: Func<TIn, TOut> | IQueue<TIn>;
     }) {
         this.uid = randomUUID();
     }
@@ -56,23 +25,19 @@ export class Api<TIn, TOut> {
     }
 };
 
-export interface Queue<T extends Object> {
+export interface IQueue<T extends Object> {
     put: Api<T, void>;
     poll: Api<number | undefined, T[]>;
 };
 
+export const Queue = <T>() => Graduate<IQueue<T>>();
+
 export class QueuePoller<T> {
     constructor(private init: {
-        queue: Lazy<Queue<T>>;
+        queue: IQueue<T>;
         poller: Func<T, void>;
     }) { };
 };
-
-export const notImplementedApi = <T>() => new Api<T, void>({
-    target: new Func({
-        code: (dest: T) => { throw new Error('This API has no implementation yet.') }
-    })
-});
 
 export interface ITopic<T> {
     readonly theSubs: (Api<T, void> | Func<T, void>)[];
@@ -94,12 +59,14 @@ export class ArchTopic<T> implements Partial<ITopic<T>> {
 
 export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
-export interface KeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
+export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
     list: Api<void, T[]>;
     get: Api<TKey | Partial<T>, T | undefined>;
     delete: Api<TKey, boolean>;
     put: Api<T, T>;
 };
+
+export const KeyValueStore = <TKey, TVal>() => Graduate<IKeyValueStore<TKey, TVal>>();
 
 export class Func<TIn = undefined, TOut = void>  {
     constructor(public init: {
@@ -161,14 +128,14 @@ export class ApiServer {
 };
 
 
-export abstract class Autoscaler {
-    constructor(private init?: {}) { }
+export interface IAutoscaler {
+    get nodeCount(): number;
+    set nodeCount(newCount: number);
 
-    abstract get nodeCount(): number;
-    abstract set nodeCount(newCount: number);
-
-    abstract get idleNodeCount(): number;
+    get idleNodeCount(): number;
 };
+
+export const Autoscaler = () => Graduate<IAutoscaler>();
 
 export type DockerStates = 'created' | 'restarting' | 'running' | 'paused' | 'exited' | 'dead';
 
@@ -182,7 +149,7 @@ export type ContainerStateEvent = {
 export type TaskUid = string;
 
 export type ContainerRuntimeInit = {
-    autoscaler: Autoscaler;
+    autoscaler: IAutoscaler;
     stateChangeTopic: ITopic<ContainerStateEvent>;
 };
 
@@ -191,10 +158,18 @@ export type DockerRun = {
     cmd: string[];
 };
 
-export abstract class ContainerRuntime {
-    constructor(public init: ContainerRuntimeInit) { };
+export interface IContainerRuntime {
+    autoscaler: IAutoscaler;
+    stateChangeTopic: ITopic<ContainerStateEvent>;
 
-    abstract run: Api<DockerRun, TaskUid>;
+    run: Api<DockerRun, TaskUid>;
 };
+
+export class ArchContainerRuntime implements Partial<IContainerRuntime> {
+    stateChangeTopic?: ITopic<ContainerStateEvent>;
+    scaler?: IAutoscaler;
+}
+
+export const ContainerRuntime = () => Graduate<IContainerRuntime>(new ArchContainerRuntime());
 
 export * from './gradual';

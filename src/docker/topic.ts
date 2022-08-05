@@ -3,11 +3,11 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DockerTopic<T extends Object> implements Partial<maxim.ITopic<T>> {
+export class DockerTopic<T extends Object> extends maxim.Selfed<maxim.ITopic<T>> implements Partial<maxim.ITopic<T>> {
     get apiName() { return `topic-${this.init.name}`; }
 
-    constructor(public readonly init: DockerServerInit & { parent: maxim.ITopic<T> & maxim.Extendo<maxim.ITopic<T>> }) {
-        init.parent.extend(this);
+    constructor(public readonly init: DockerServerInit) {
+        super();
 
         const server: maxim.ApiServerProps = {
             name: this.apiName,
@@ -37,7 +37,7 @@ export class DockerTopic<T extends Object> implements Partial<maxim.ITopic<T>> {
     }
 
     private _subscribe = (input: maxim.Api<T, void> | maxim.Func<T, void>) => {
-        this.init.parent.theSubs.push(input);
+        this.self.theSubs.push(input);
     };
 
     subscribe = new HttpApi({
@@ -48,7 +48,7 @@ export class DockerTopic<T extends Object> implements Partial<maxim.ITopic<T>> {
 
     private _publish = (elem: T) => {
         console.log('Got new message!', elem);
-        this.init.parent.theSubs.map(sub => sub.exec(elem));
+        this.self.theSubs.map(sub => sub.exec(elem));
     }
 
     publish = new HttpApi({
