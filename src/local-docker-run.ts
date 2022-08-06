@@ -5,7 +5,7 @@ import { Container, DockerProvider, Image } from "@cdktf/provider-docker";
 import { apiServerBuildContext } from './docker/api-server/api-server';
 import { DockerQueue } from './docker/queue';
 import { DockerKeyValueStore } from './docker/key-value-store';
-import { ApiServer, ApiServerProps, ContainerStateEvent } from './anthill/main';
+import { ApiServer, ApiServerProps, ContainerStateEvent, IQueuePoller } from './anthill/main';
 import { DockerTopic } from './docker/topic';
 import { DockerRuntime, DummyAutoscaler } from './docker/docker-runtime';
 import { run } from './docker/api-server/app/main';
@@ -19,8 +19,38 @@ export const build = (stack: TerraformStack) => {
     const taskQueue = arch.taskQueue.extend(new DockerQueue<arch.Task>({
         name: 'task-queue',
         port: 8000,
-        host: '127.0.0.1'
+        host: '127.0.0.1',
+        itemTimeout: 10,
+        coProcessInit: () => {
+            setInterval(taskQueuePoller.tick, 1000);
+        }
     }));
+
+    taskQueuePoller.extend({
+        tick: async () => {
+            console.log('tick');
+
+            // TODO: get rid of undefined
+            const toRun = await arch.taskQueue.poll.localExec(undefined);
+
+            console.log('got some tasks?', toRun);
+
+            const runs = (toRun || []).map(task => ({
+                ran: taskQueuePoller.poller.exec(task),
+                task
+            }))
+                .map(async ({ ran, task }) => {
+                    try {
+                        await ran;
+                        arch.taskQueue.markDone.localExec(task.queueUid);
+                    } catch (e) {
+                        console.log(`Task ${JSON.stringify(task)} run failed`, e);
+                    }
+                });
+
+            await Promise.all(runs);
+        }
+    })
 
     const taskStore = arch.taskStore.extend(new DockerKeyValueStore<string, arch.Task>({
         name: 'task-store',

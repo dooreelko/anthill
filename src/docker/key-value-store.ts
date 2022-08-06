@@ -28,10 +28,17 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
                         }
                     },
                     {
-                        api: this.get,
+                        api: this.find,
                         spec: {
-                            path: '/v1/get',
+                            path: '/v1/get/{id}',
                             method: 'GET'
+                        }
+                    },
+                    {
+                        api: this.find,
+                        spec: {
+                            path: '/v1/find',
+                            method: 'POST'
                         }
                     },
                     {
@@ -58,15 +65,20 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
     _list = () => [...this.theStore.values()];
 
 
-    _get = (criteria: TKey | Partial<T>) => {
+    _find = (criteria: TKey | Partial<T>) => {
+        console.log('finding', criteria);
         if (typeof criteria === 'string') {
+            console.log('eez a string', criteria);
             return this.theStore.get(criteria);
         }
 
         const unwrappedFilter = Object.entries(criteria) as [string, T][];
 
-        return [...this.theStore.values()]
-            .find((el: Record<string, any>) => unwrappedFilter.every(([k, v]) => el[k] && el[k] === v));
+        const found = [...this.theStore.values()]
+            .find((el: Record<string, any>) => unwrappedFilter.every(([k, v]) => !!el[k] && el[k] === v));
+
+        console.log('for', unwrappedFilter, 'found', found, 'in', this.theStore);
+        return found;
     }
 
     _delete = (id: TKey) => this.theStore.delete(id);
@@ -89,9 +101,9 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         })
     });
 
-    get = new HttpApi({
+    find = new HttpApi({
         target: new maxim.Func<TKey | Partial<T>, T | undefined>({
-            code: this._get
+            code: this._find
         })
     });
 

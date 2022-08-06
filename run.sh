@@ -2,7 +2,11 @@
 
 set -exo pipefail
 
-(cd cdktf.out/stacks/dorc-implmementation/ && terraform init && terraform destroy -auto-approve || true)
+SELF=$(dirname $0)
+
+clear
+
+"$SELF/unrun.sh"
 
 npm run build
 node .
@@ -19,4 +23,4 @@ docker ps --format '{{ json .}}' \
     | jq -r .Names \
     | xargs -I{} bash -c 'echo === {} ===; docker logs {}'
 
-curl localhost:8080/v1/tasks -vvv 
+curl localhost:8080/v1/tasks -vvv | jq .

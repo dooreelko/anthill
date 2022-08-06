@@ -2,7 +2,7 @@
 import {
     DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
-    Func, Api, TaskUid, QueuePoller, Topic
+    Func, Api, TaskUid, QueuePoller, Topic, IQueuePoller
 } from "./anthill/main";
 
 /** SOLUTION DESIGN */
@@ -75,7 +75,13 @@ export const runTaskFunction = new Func<Task>({
     code: async t => {
         let uid: TaskUid;
         try {
-            uid = await containerRuntime.run.exec(t);
+            const response = await containerRuntime.run.exec(t);
+
+            if ('error' in response) {
+                throw response.error;
+            }
+
+            uid = response.uid;
         } catch (e) {
             throw new Error(`Container runtime refused new task with ${e}`);
         }
@@ -102,7 +108,7 @@ export const apiListTasks = new Api<unknown, Task[]>({
 });
 
 export const getTaskFunction = new Func<string, Task | undefined>({
-    code: (id) => taskStore.get.exec(id)
+    code: (id) => taskStore.find.exec(id)
 });
 
 export const apiGetTask = new Api<string, Task | undefined>({
@@ -111,22 +117,36 @@ export const apiGetTask = new Api<string, Task | undefined>({
 
 export const taskStateFunction = new Func<ContainerStateEvent, void>({
     code: async e => {
-        const task = await taskStore
-            .get.exec({ uid: e.uid });
+        try {
+            console.log('finding', e);
+            const task = await taskStore
+                .find.exec({ uid: e.uid });
 
-        // not all images will be managed by us
-        if (!task) {
-            console.error('event', e, 'is not ours');
-            return;
-        }
+            console.log('got task', task);
 
-        taskStore
-            .put.exec({
+            // not all images will be managed by us
+            if (!task) {
+                console.error('event', e, 'is not ours');
+                return;
+            }
+
+            const newTask = {
                 ...task,
                 state: e.status
-            });
+            };
 
-        taskStateTopic.publish.exec(task);
+            console.log('will save and announce', newTask);
+
+            const proms = await Promise.allSettled([
+                taskStore.put.exec(newTask),
+                taskStateTopic.publish.exec(newTask)
+            ]);
+
+            console.log('saved and announced', newTask, proms);
+        } catch (e) {
+            console.error('failed updating task', e);
+        }
+
     }
 });
 

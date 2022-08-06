@@ -25,16 +25,21 @@ export class Api<TIn, TOut> {
     }
 };
 
-export interface IQueue<T extends Object> {
+export type QueueUid<TUid> = { queueUid: TUid };
+
+export interface IQueue<T extends Object, TUid = string> {
     put: Api<T, void>;
-    poll: Api<number | undefined, T[]>;
+    poll: Api<number | undefined, (T & QueueUid<TUid>)[]>;
+    markDone: Api<TUid | TUid[], void>;
 };
 
-export const Queue = <T>() => Graduate<IQueue<T>>();
+export const Queue = <T, TUid = string>() => Graduate<IQueue<T, TUid>>();
 
-export interface IQueuePoller<T> {
-    queue: IQueue<T>;
+export interface IQueuePoller<T, TUid = string> {
+    queue: IQueue<T, TUid>;
     poller: Func<T, void>;
+
+    tick: () => void;
 };
 
 export const QueuePoller = <T>() => Graduate<IQueuePoller<T>>();
@@ -61,7 +66,7 @@ export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
 export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
     list: Api<void, T[]>;
-    get: Api<TKey | Partial<T>, T | undefined>;
+    find: Api<TKey | Partial<T>, T | undefined>;
     delete: Api<TKey, boolean>;
     put: Api<T, T>;
 };
@@ -157,12 +162,9 @@ export interface IContainerRuntime {
     autoscaler: IAutoscaler;
     stateChangeTopic: ITopic<ContainerStateEvent>;
 
-    run: Api<DockerRun, TaskUid>;
+    run: Api<DockerRun, { uid: TaskUid } | { error: any }>;
 };
 
-export const ContainerRuntime = () => Graduate<IContainerRuntime>({
-    autoscaler: undefined,
-    stateChangeTopic: undefined,
-});
+export const ContainerRuntime = () => Graduate<IContainerRuntime>();
 
 export * from './gradual';

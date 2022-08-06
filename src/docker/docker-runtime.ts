@@ -37,7 +37,6 @@ export type DockerEvent = {
 
 export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> implements Partial<maxim.IContainerRuntime> {
     private docker = new Docker();
-    private listening = false;
 
     get apiName() { return `docker-${this.init.name}`; }
 
@@ -77,10 +76,14 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
                 type: ['container']
             }
         }).then(stream => {
-            this.listening = true;
             const jsons: EventEmitter = new JSONStream(stream);
+
             jsons.on('json', async (j: DockerEvent) => {
+                // console.log('Docker event', j);
+
                 const container = this.docker.getContainer(j.id);
+                // console.log('Container', container, container.inspect);
+
                 const state = await container.inspect();
 
                 this.self.stateChangeTopic!.publish.exec({
@@ -88,7 +91,6 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
                     exitCode: Number(j.Actor.Attributes['exitCode']) || -1,
                     status: state.State.Status as maxim.DockerStates
                 })
-                console.log('Docker event', j);
             });
         }).catch(err => {
             console.error('Failed connecting to the docker events. Aborting.', err);
@@ -97,37 +99,26 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
     };
 
     private _run = async (input: DockerRun) => {
-        if (!this.listening) {
-            this.startListening();
-        }
-
-        return new Promise<maxim.TaskUid>((resolve, reject) => {
-            this.docker.run(input.image, input.cmd, process.stdout, async (err, cont) => {
-                const container = cont as Docker.Container;
-                const exitCode = (await container.inspect()).State.ExitCode;
+        return this.docker.run(input.image, input.cmd, process.stdout)
+            .then(async ([, cont]) => {
+                const uid = this.containerUid(cont);
 
                 await this.self.stateChangeTopic!.publish.exec({
-                    uid: this.containerUid(container),
-                    exitCode,
-                    message: String(err),
-                    status: 'dead'
-                });
-
-                reject(err);
-            }).on('container', async (cont: Docker.Container) => {
-                await this.self.stateChangeTopic!.publish.exec({
-                    uid: this.containerUid(cont),
-                    exitCode: 0,
+                    uid,
+                    exitCode: -1,
                     status: 'running'
                 });
 
-                resolve(this.containerUid(cont));
+                return { uid };
+            }).catch(e => {
+                console.error('Failed submitting container', e);
+
+                return { error: e }
             });
-        });
     };
 
     run = new HttpApi({
-        target: new maxim.Func<DockerRun, maxim.TaskUid>({
+        target: new maxim.Func<DockerRun, { uid: maxim.TaskUid } | { error: any }>({
             code: this._run
         })
     });
