@@ -1,12 +1,11 @@
 
-
-/** DESIGN */
-
 import {
     DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
     Func, Api, TaskUid, QueuePoller, Topic
 } from "./anthill/main";
+
+/** SOLUTION DESIGN */
 
 export type Task = {
     // id of the task in the store
@@ -30,6 +29,8 @@ const TaskTopic = Topic<Task>();
 
 const TaskQueue = Queue<Task>();
 
+const TaskQueuePoller = QueuePoller<Task>();
+
 const TaskKeyValueStore = KeyValueStore<string, Task>();
 
 const DorcAutoscaler = Autoscaler();
@@ -48,9 +49,10 @@ export const containerStateTopic = new ContainerStateEventTopic();
 
 export const taskStateTopic = new TaskTopic();
 
-export const containerRuntime = new DorcContainerRuntime();
-console.log(containerRuntime, containerRuntime.stateChangeTopic);
-containerRuntime.stateChangeTopic = containerStateTopic;
+export const containerRuntime = new DorcContainerRuntime({
+    stateChangeTopic: containerStateTopic,
+    autoscaler: scaler
+});
 
 export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
     code: async (request: TaskSubmissionRequest) => {
@@ -86,7 +88,7 @@ export const runTaskFunction = new Func<Task>({
     }
 });
 
-export const taskQueuePoller = new QueuePoller<Task>({
+export const taskQueuePoller = new TaskQueuePoller({
     queue: taskQueue,
     poller: runTaskFunction
 });

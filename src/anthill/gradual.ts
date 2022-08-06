@@ -77,8 +77,8 @@ export class Gradual<T> {
     }
 };
 
-export const Graduate = <T>(...arg: Partial<T>[]) => new Proxy<{}>(Gradual, {
-    construct: () => {
-        return new Gradual<T>(...arg);
+export const Graduate = <T>(...archArgs: Partial<T>[]) => new Proxy<{}>(Gradual, {
+    construct: (_, constructArgs) => {
+        return new Gradual<T>(...[...archArgs, ...constructArgs]);
     }
-}) as (new () => T & Extendo<T>);
+}) as (new (...constructArgs: Partial<T>[]) => T & Extendo<T>);

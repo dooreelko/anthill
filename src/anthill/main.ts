@@ -32,12 +32,12 @@ export interface IQueue<T extends Object> {
 
 export const Queue = <T>() => Graduate<IQueue<T>>();
 
-export class QueuePoller<T> {
-    constructor(private init: {
-        queue: IQueue<T>;
-        poller: Func<T, void>;
-    }) { };
+export interface IQueuePoller<T> {
+    queue: IQueue<T>;
+    poller: Func<T, void>;
 };
+
+export const QueuePoller = <T>() => Graduate<IQueuePoller<T>>();
 
 export interface ITopic<T> {
     readonly theSubs: (Api<T, void> | Func<T, void>)[];
@@ -148,11 +148,6 @@ export type ContainerStateEvent = {
 
 export type TaskUid = string;
 
-export type ContainerRuntimeInit = {
-    autoscaler: IAutoscaler;
-    stateChangeTopic: ITopic<ContainerStateEvent>;
-};
-
 export type DockerRun = {
     image: string;
     cmd: string[];
@@ -165,11 +160,9 @@ export interface IContainerRuntime {
     run: Api<DockerRun, TaskUid>;
 };
 
-export class ArchContainerRuntime implements Partial<IContainerRuntime> {
-    stateChangeTopic?: ITopic<ContainerStateEvent>;
-    scaler?: IAutoscaler;
-}
-
-export const ContainerRuntime = () => Graduate<IContainerRuntime>(new ArchContainerRuntime());
+export const ContainerRuntime = () => Graduate<IContainerRuntime>({
+    autoscaler: undefined,
+    stateChangeTopic: undefined,
+});
 
 export * from './gradual';
