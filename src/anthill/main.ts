@@ -64,11 +64,15 @@ export class ArchTopic<T> implements Partial<ITopic<T>> {
 
 export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
+export type EntryHistory<T> = (T & { when: Date })[];
+
 export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
     list: Api<void, T[]>;
-    find: Api<TKey | Partial<T>, T | undefined>;
+    get: Api<{ id: TKey }, T | undefined>;
+    find: Api<Partial<T>, T | undefined>;
     delete: Api<TKey, boolean>;
     put: Api<T, T>;
+    history: Api<{ id: TKey }, EntryHistory<T> | undefined>;
 };
 
 export const KeyValueStore = <TKey, TVal>() => Graduate<IKeyValueStore<TKey, TVal>>();
@@ -144,27 +148,30 @@ export const Autoscaler = () => Graduate<IAutoscaler>();
 
 export type DockerStates = 'created' | 'restarting' | 'running' | 'paused' | 'exited' | 'dead';
 
-export type ContainerStateEvent = {
+export type ContainerStateEvent<TLabels extends string> = {
     uid: string;
     status: DockerStates;
     message?: string;
     exitCode: number;
+    labels?: Partial<Record<TLabels, string>>;
 };
 
 export type TaskUid = string;
 
-export type DockerRun = {
+export type DockerRun<TLabels extends string> = {
+    labels: Partial<Record<TLabels, string>>,
     image: string;
     cmd: string[];
 };
 
-export interface IContainerRuntime {
+export interface IContainerRuntime<TLabels extends string> {
     autoscaler: IAutoscaler;
-    stateChangeTopic: ITopic<ContainerStateEvent>;
+    stateChangeTopic: ITopic<ContainerStateEvent<TLabels>>;
 
-    run: Api<DockerRun, { uid: TaskUid } | { error: any }>;
+    run: Api<DockerRun<TLabels>, { uid: TaskUid } | { error: any }>;
+    logs: Api<{ uid: TaskUid }, string[]>;
 };
 
-export const ContainerRuntime = () => Graduate<IContainerRuntime>();
+export const ContainerRuntime = <TLabels extends string>() => Graduate<IContainerRuntime<TLabels>>();
 
 export * from './gradual';

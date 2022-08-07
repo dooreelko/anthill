@@ -7,6 +7,70 @@ export const apiInventory = {};
 
 export const apiServerPath = __filename;
 
+const pathArg = new RegExp(/{(?<key>[0-9a-zA-Z]+)}/);
+
+/**
+ * For /v1/{arg1}/{arg2} convert
+ * {
+ *  arg1: 'foo',
+ *  arg2: 'bar'
+ * } into
+ * /v1/foo/bar 
+ * 
+ * TODO: enrich query
+ */
+export const enrichPath = <TIn extends Record<string, any>>(pathSpec: string, vars: TIn) => {
+    const pathParts = pathSpec.split('/');
+
+    return pathParts.map(part => {
+        const arg = pathArg.exec(part);
+        if (arg) {
+            return String(vars[arg.groups?.key || 'BADKEY'])
+        } else {
+            return part;
+        }
+    }).join('/');
+};
+
+/**
+ * Convert /v1/foo/bar for /v1/{arg1}/{arg2} into
+ * {
+ *  arg1: 'foo',
+ *  arg2: 'bar'
+ * }
+ */
+const matchPath = (path: string, pathSpec: string) => {
+    const specParts = pathSpec.split('/');
+    const pathParts = path.split('/');
+
+    if (specParts.length !== pathParts.length) {
+        return;
+    }
+
+    const parsed = specParts.map((v, idx) => {
+        const arg = pathArg.exec(v);
+        if (arg) {
+            return {
+                [arg.groups?.key || 'BADKEY']: decodeURIComponent(pathParts[idx])
+            };
+        } else {
+            return v === pathParts[idx];
+        }
+    });
+
+    if (!parsed.every(v => !!v)) {
+        return;
+    }
+
+    return parsed
+        .filter(el => typeof el !== 'boolean')
+        .map(el => el as Record<string, string>)
+        .reduce((sofar, curr) => ({
+            ...sofar,
+            ...curr
+        }), {});
+}
+
 export const run = (server: ApiServerProps) => {
     const app = new Koa();
 
@@ -18,39 +82,6 @@ export const run = (server: ApiServerProps) => {
     app.use((ctx: Koa.Context, next: Koa.Next) => logger((str) => console.log(server.name, str, ctx.request.body || '[nobody]', ' ==>', ctx.response.body || '[nobody]'))(ctx, next));
 
     const { listener, name } = server;
-
-    const pathArg = new RegExp(/{(?<key>[0-9a-zA-Z]+)}/);
-    const matchPath = (path: string, pathSpec: string) => {
-        const specParts = pathSpec.split('/');
-        const pathParts = path.split('/');
-
-        if (specParts.length !== pathParts.length) {
-            return;
-        }
-
-        const parsed = specParts.map((v, idx) => {
-            const arg = pathArg.exec(v);
-            if (arg) {
-                return {
-                    [arg.groups?.key || 'BADKEY']: pathParts[idx]
-                };
-            } else {
-                return v === pathParts[idx];
-            }
-        });
-
-        if (!parsed.every(v => !!v)) {
-            return;
-        }
-
-        return parsed
-            .filter(el => typeof el !== 'boolean')
-            .map(el => el as Record<string, string>)
-            .reduce((sofar, curr) => ({
-                ...sofar,
-                ...curr
-            }), {});
-    }
 
     listener.apis.map(apiDef => ({
         apiDef,
@@ -64,14 +95,14 @@ export const run = (server: ApiServerProps) => {
                 return await next();
             }
 
-            // console.log('matched to ', apiDef.api, 'will use body of', ctx);
-            console.log('matched to ', apiDef.api);
+            const callBody = {
+                ...pathMatcher,
+                ...ctx.request.body
+            };
+            console.log('matched to ', apiDef.api, apiDef.spec.path, callBody);
 
             try {
-                ctx.body = await apiDef.api.localExec({
-                    ...pathMatcher,
-                    ...ctx.request.body
-                });
+                ctx.body = await apiDef.api.localExec(callBody);
                 ctx.type = 'application/json';
             } catch (e) {
                 console.error('Error calling local api', e);

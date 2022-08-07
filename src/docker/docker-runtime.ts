@@ -35,7 +35,7 @@ export type DockerEvent = {
     timeNano: number
 };
 
-export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> implements Partial<maxim.IContainerRuntime> {
+export class DockerRuntime<TLabels extends string> extends maxim.Selfed<maxim.IContainerRuntime<TLabels>> implements Partial<maxim.IContainerRuntime<TLabels>> {
     private docker = new Docker();
 
     get apiName() { return `docker-${this.init.name}`; }
@@ -55,6 +55,13 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
                             path: '/v1/run',
                             method: 'POST'
                         }
+                    },
+                    {
+                        api: this.logs,
+                        spec: {
+                            path: '/v1/{uid}/logs',
+                            method: 'GET'
+                        }
                     }
                 ]
             }
@@ -67,6 +74,11 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
     }
 
     private containerUid = (cont: { id: string }) => `${this.init.host}|${cont.id}`;
+    private containerLocalId = (cont: { uid: string }) => {
+        const id = cont.uid.split('|').slice(1);
+
+        return [...id, 'NOID'][0];
+    }
 
     private startListening = () => {
         console.error('This is docker runtime. Listening on engine events.');
@@ -87,6 +99,7 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
                 const state = await container.inspect();
 
                 this.self.stateChangeTopic!.publish.exec({
+                    labels: (await container.inspect()).Config.Labels as Partial<Record<TLabels, string>>,
                     uid: this.containerUid(container),
                     exitCode: Number(j.Actor.Attributes['exitCode']) || -1,
                     status: state.State.Status as maxim.DockerStates
@@ -98,8 +111,10 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
         });
     };
 
-    private _run = async (input: DockerRun) => {
-        return this.docker.run(input.image, input.cmd, process.stdout)
+    private _run = async (input: DockerRun<TLabels>) => {
+        return this.docker.run(input.image, input.cmd, process.stdout, {
+            labels: input.labels
+        })
             .then(async ([, cont]) => {
                 const uid = this.containerUid(cont);
 
@@ -117,9 +132,42 @@ export class DockerRuntime extends maxim.Selfed<maxim.IContainerRuntime> impleme
             });
     };
 
+    private _logs = (task: { uid: maxim.TaskUid }) => {
+        const localId = this.containerLocalId(task);
+        return this.docker.getContainer(localId).logs({
+            stdout: true,
+            stderr: true,
+            timestamps: true,
+            details: true
+        })
+            .then(async stream => {
+                console.log(stream);
+
+                if (Buffer.isBuffer(stream)) {
+                    return (stream as Buffer).toString('utf-8').split(/[\r\n/]+/);
+                }
+
+                const chunks = []
+                for await (let chunk of stream) {
+                    chunks.push(chunk as Buffer)
+                }
+                return Buffer.concat(chunks).toString('utf-8').split(/[\r\n/]+/)
+            }).catch(e => {
+                console.error('Failed getting logs for', localId, e);
+
+                throw e;
+            });
+    }
+
     run = new HttpApi({
-        target: new maxim.Func<DockerRun, { uid: maxim.TaskUid } | { error: any }>({
+        target: new maxim.Func<DockerRun<TLabels>, { uid: maxim.TaskUid } | { error: any }>({
             code: this._run
+        })
+    });
+
+    logs = new HttpApi<{ uid: maxim.TaskUid }, string[]>({
+        target: new maxim.Func<{ uid: maxim.TaskUid }, string[]>({
+            code: this._logs
         })
     });
 

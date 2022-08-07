@@ -58,7 +58,7 @@ export const build = (stack: TerraformStack) => {
         host: '127.0.0.1'
     }));
 
-    const containerTopic = arch.containerStateTopic.extend(new DockerTopic<ContainerStateEvent>({
+    const containerTopic = arch.containerStateTopic.extend(new DockerTopic<ContainerStateEvent<arch.DockerLabels>>({
         name: 'container-topic',
         port: 8002,
         host: '127.0.0.1'
@@ -115,6 +115,20 @@ export const build = (stack: TerraformStack) => {
                     spec: {
                         method: 'GET',
                         path: '/v1/task/{id}'
+                    }
+                },
+                {
+                    api: arch.apiGetTaskHistory,
+                    spec: {
+                        method: 'GET',
+                        path: '/v1/task/{id}/history'
+                    }
+                },
+                {
+                    api: arch.apiGetTaskLogs,
+                    spec: {
+                        method: 'GET',
+                        path: '/v1/task/{id}/logs'
                     }
                 },
             ]

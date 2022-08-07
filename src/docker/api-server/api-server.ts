@@ -2,6 +2,7 @@ import path = require('path');
 import fetch from 'node-fetch';
 import { findBuildContextRoot } from "../tools";
 import * as maxim from '../../anthill/main';
+import { enrichPath } from './app/main';
 
 export const methodWithBody = (method: maxim.ApiContext['method']) =>
     method !== 'GET'
@@ -30,18 +31,22 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
                 }
             )
         };
-        console.log('Calling api', (listener as any).name || listener, thisDef.spec.path, fetchInit.body);
 
-        return fetch(new URL(thisDef.spec.path, `http://${listener.host}:${listener.port}`).href, fetchInit)
+        const enrichedPath = enrichPath(thisDef.spec.path, arg);
+
+        console.log('Enriched', thisDef.spec.path, 'using', arg, 'into', enrichedPath);
+        console.log('Calling api', (listener as any).name || listener, enrichedPath, fetchInit.body);
+
+        return fetch(new URL(enrichedPath, `http://${listener.host}:${listener.port}`).href, fetchInit)
             .then(r => r.status !== 204 && r.json())
             .then(r => r as TOut)
             .then(r => {
-                console.error('Success calling API', thisDef.spec.path, r);
+                console.error('Success calling API', enrichedPath, r);
 
                 return r;
             })
             .catch(e => {
-                console.error('Error calling API', thisDef.spec.path, e);
+                console.error('Error calling API', enrichedPath, e);
                 throw e;
             });
     }

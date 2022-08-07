@@ -8,6 +8,7 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
     extends maxim.Selfed<maxim.IKeyValueStore<TKey, T>>
     implements maxim.IKeyValueStore<TKey, T> {
     private theStore = new Map<TKey, T>();
+    private theStoreHistory = new Map<TKey, (T & { when: Date })[]>();
 
     get apiName() { return `kv-${this.init.name}`; }
 
@@ -30,13 +31,6 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
                     {
                         api: this.find,
                         spec: {
-                            path: '/v1/get/{id}',
-                            method: 'GET'
-                        }
-                    },
-                    {
-                        api: this.find,
-                        spec: {
                             path: '/v1/find',
                             method: 'POST'
                         }
@@ -51,8 +45,22 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
                     {
                         api: this.delete,
                         spec: {
-                            path: '/v1/delete',
+                            path: '/v1/task',
                             method: 'DELETE'
+                        }
+                    },
+                    {
+                        api: this.get,
+                        spec: {
+                            path: '/v1/task/{id}',
+                            method: 'GET'
+                        }
+                    },
+                    {
+                        api: this.history,
+                        spec: {
+                            path: '/v1/task/{id}/history',
+                            method: 'GET'
                         }
                     },
                 ]
@@ -64,6 +72,15 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
 
     _list = () => [...this.theStore.values()];
 
+
+    _get = (key: { id: TKey }) => this.theStore.get(key.id);
+
+    _history = (key: { id: TKey }) => {
+        const sorted = [...(this.theStoreHistory
+            .get(key.id) || [])];
+
+        return sorted.sort((a, b) => a.when.getTime() - b.when.getTime());
+    }
 
     _find = (criteria: TKey | Partial<T>) => {
         console.log('finding', criteria);
@@ -92,6 +109,15 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
 
         this.theStore.set(id, newOne);
 
+        if (!this.theStoreHistory.has(id)) {
+            this.theStoreHistory.set(id, []);
+        }
+
+        this.theStoreHistory.get(id)?.push({
+            ...newOne,
+            when: new Date()
+        });
+
         return newOne;
     };
 
@@ -101,8 +127,14 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         })
     });
 
+    get = new HttpApi({
+        target: new maxim.Func<{ id: TKey }, T | undefined>({
+            code: this._get
+        })
+    });
+
     find = new HttpApi({
-        target: new maxim.Func<TKey | Partial<T>, T | undefined>({
+        target: new maxim.Func<Partial<T>, T | undefined>({
             code: this._find
         })
     });
@@ -116,6 +148,12 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
     delete = new HttpApi({
         target: new maxim.Func<TKey, boolean>({
             code: this._delete
+        })
+    });
+
+    history = new HttpApi({
+        target: new maxim.Func<{ id: TKey }, maxim.EntryHistory<T> | undefined>({
+            code: this._history
         })
     });
 };

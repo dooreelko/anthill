@@ -63,8 +63,9 @@ export class DockerQueue<T extends Object> extends maxim.Selfed<maxim.IQueue<T>>
         setTimeout(() => {
             const notDones = inFlight.filter(el => !this.theDones.has(el.queueUid));
 
-            this.theQueue.push(...notDones);
             console.log('These guys go back to the queue', notDones);
+            // TODO: uncomment and implement max retry count
+            // this.theQueue.push(...notDones);
 
             inFlight
                 .map(el => el.queueUid)
