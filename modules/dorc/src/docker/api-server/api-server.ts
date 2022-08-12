@@ -1,7 +1,7 @@
 import path = require('path');
 import fetch from 'node-fetch';
 import { findBuildContextRoot } from "../tools";
-import * as maxim from '../../anthill/main';
+import * as maxim from '@anthill/core';
 import { enrichPath } from './app/main';
 
 export const methodWithBody = (method: maxim.ApiContext['method']) =>
@@ -61,14 +61,3 @@ export const apiServerBuildContext = () => {
         dockerfile: path.relative(contextRoot, path.join(__dirname, 'api-server.Dockerfile'))
     };
 }
-
-// export const build = (stack: TerraformStack, name: string) => {
-
-
-//     return {
-//         server,
-//         serverPath: path
-//             .relative(path.join(contextRoot, 'dist'), apiServerPath)
-//             .replace(path.extname(apiServerPath), '')
-//     };
-// };

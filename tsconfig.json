@@ -1,43 +1,12 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "alwaysStrict": true,
-    "charset": "utf8",
-    "declaration": true,
-    "experimentalDecorators": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "lib": [
-      "ES2022"
-    ],
-    "module": "CommonJS",
-    "noEmitOnError": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    // TODO
-    "noUnusedLocals": false,
-    // TODO
-    "noUnusedParameters": false,
-    "resolveJsonModule": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "stripInternal": true,
-    "target": "ES2022",
-    "incremental": true
-  },
-  "include": [
-    "**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "cdktf.out",
-    "dist"
-  ],
-  "ts-node": {
-    "files": true
-  }
+    "files": [],
+    "include": [],
+    "references": [
+        {
+            "path": "./modules/anthill/tsconfig.json"
+        },
+        {
+            "path": "./modules/dorc/tsconfig.json"
+        }
+    ]
 }

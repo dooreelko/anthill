@@ -1,7 +1,9 @@
-import { runtimeRegistry } from "./src/anthill/runtime";
-import { build } from "./src/main";
+import { runtimeRegistry } from "@anthill/core";
+import { build } from "./main";
 
 build();
+
+console.log('looking for runtime', process.argv);
 
 if (process.argv.length < 2) {
     console.error(`Missing script to run argument (and params) in ${JSON.stringify(process.argv)}`);
@@ -15,5 +17,7 @@ if (!runtime) {
     console.error(`Runtime registry has no entry for ${runtimeToRun} from ${JSON.stringify(process.argv)}`);
     process.exit(1);
 }
+
+console.log('found runtime', runtime, 'for', runtimeToRun);
 
 runtime();

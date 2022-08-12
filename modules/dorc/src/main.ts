@@ -18,3 +18,10 @@ export const build = () => {
 
     return app;
 }
+
+if (require.main === module) {
+    build().synth();
+
+    console.log('exiting as this is only synth');
+    process.exit(0);
+}

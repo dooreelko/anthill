@@ -1,0 +1,23 @@
+{
+    "name": "@anthill/core",
+    "version": "1.0.0",
+    "description": "Architecture as code with pluggable design, main library",
+    "main": "dist/src/main.js",
+    "scripts": {
+        "build": "tsc",
+        "compile": "tsc --pretty",
+        "watch": "tsc --watch --pretty",
+        "test": "jest",
+        "test:watch": "jest --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dooreelko/dorc.git"
+    },
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/dooreelko/dorc/issues"
+    },
+    "homepage": "https://github.com/dooreelko/dorc#readme"
+}

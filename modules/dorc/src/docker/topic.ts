@@ -1,4 +1,4 @@
-import * as maxim from '../anthill/main';
+import * as maxim from '@anthill/core';
 import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';

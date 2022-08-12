@@ -3,7 +3,7 @@ import {
     DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
     Func, Api, TaskUid, QueuePoller, Topic, EntryHistory
-} from "./anthill/main";
+} from "@anthill/core";
 
 /** SOLUTION DESIGN */
 

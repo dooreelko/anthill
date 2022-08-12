@@ -1,8 +1,8 @@
 import Docker = require('dockerode');
 import JSONStream = require('pixl-json-stream');
 import { EventEmitter } from 'stream';
-import * as maxim from '../anthill/main';
-import { DockerRun } from '../anthill/main';
+import * as maxim from '@anthill/core';
+import { DockerRun } from '@anthill/core';
 import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';

@@ -1,7 +1,7 @@
 import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
-import { ApiServerProps } from '../../../anthill/main';
+import { ApiServerProps } from '@anthill/core';
 
 export const apiInventory = {};
 

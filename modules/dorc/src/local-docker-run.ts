@@ -5,7 +5,7 @@ import { Container, DockerProvider, Image } from "@cdktf/provider-docker";
 import { apiServerBuildContext } from './docker/api-server/api-server';
 import { DockerQueue } from './docker/queue';
 import { DockerKeyValueStore } from './docker/key-value-store';
-import { ApiServer, ApiServerProps, ContainerStateEvent, IQueuePoller } from './anthill/main';
+import { ApiServer, ApiServerProps, ContainerStateEvent, IQueuePoller } from '@anthill/core';
 import { DockerTopic } from './docker/topic';
 import { DockerRuntime, DummyAutoscaler } from './docker/docker-runtime';
 import { run } from './docker/api-server/app/main';

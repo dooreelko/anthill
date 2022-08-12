@@ -1,0 +1,10 @@
+{
+    "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+    "useNx": true,
+    "useWorkspaces": false,
+    "version": "1.0.0",
+    "packages": [
+        ".",
+        "modules/*"
+    ]
+}

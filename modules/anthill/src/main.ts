@@ -175,3 +175,4 @@ export interface IContainerRuntime<TLabels extends string> {
 export const ContainerRuntime = <TLabels extends string>() => Graduate<IContainerRuntime<TLabels>>();
 
 export * from './gradual';
+export * from './runtime';

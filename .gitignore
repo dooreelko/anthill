@@ -1,6 +1,10 @@
 *.d.ts
-!src/**/*.d.ts
-*.js
+!**/src/*.d.ts
+
+**/*.js
+!jest.config.js
+!setup.js
+
 node_modules
 cdktf.out
 cdktf.log
@@ -8,6 +12,4 @@ cdktf.log
 .gen
 .terraform
 tsconfig.tsbuildinfo
-!jest.config.js
-!setup.js
 dist
