@@ -52,12 +52,20 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
     }
 }
 
-export const apiServerBuildContext = () => {
-    const contextRoot = findBuildContextRoot();
+/**
+ * Docker build context (during synth) should be project's root 
+ * it could be also dist but then dockerfiles will need to be copied there
+ * 
+ * @param startPath path to start from and go up searching for package.json
+ * @param dockerFile path to the dockerfile, relative to startPath
+ * @returns 
+ */
+export const apiServerBuildContext = (startPath: string, dockerFile: string) => {
+    const contextRoot = findBuildContextRoot(startPath);
 
     console.error('*** build root', contextRoot);
     return {
         path: contextRoot,
-        dockerfile: path.relative(contextRoot, path.join(__dirname, 'api-server.Dockerfile'))
+        dockerfile: path.relative(contextRoot, path.join(startPath, dockerFile))
     };
 }

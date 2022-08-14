@@ -2,13 +2,17 @@ import * as arch from './architecture';
 import { TerraformStack, TerraformOutput } from "cdktf";
 import { Container, DockerProvider, Image } from "@cdktf/provider-docker";
 
-import { apiServerBuildContext } from './docker/api-server/api-server';
-import { DockerQueue } from './docker/queue';
-import { DockerKeyValueStore } from './docker/key-value-store';
-import { ApiServer, ApiServerProps, ContainerStateEvent, IQueuePoller } from '@anthill/core';
-import { DockerTopic } from './docker/topic';
-import { DockerRuntime, DummyAutoscaler } from './docker/docker-runtime';
-import { run } from './docker/api-server/app/main';
+import { ApiServer, ApiServerProps, ContainerStateEvent } from '@anthill/core';
+
+import {
+    apiServerBuildContext,
+    DockerQueue,
+    DockerKeyValueStore,
+    DockerTopic,
+    DockerRuntime, DummyAutoscaler,
+    run
+} from '@anthill/local-docker';
+
 import { taskQueuePoller } from './architecture';
 
 /** CONCRETE SOLUTION IMPLEMENTATION */
@@ -137,7 +141,7 @@ export const build = (stack: TerraformStack) => {
 
     new ApiServer(mainServer, () => run(mainServer));
 
-    const imageCtx = apiServerBuildContext();
+    const imageCtx = apiServerBuildContext(__dirname, 'api-server.Dockerfile');
 
     const server = new Image(stack, 'dorc-api-server', {
         name: 'dorc-api-server',

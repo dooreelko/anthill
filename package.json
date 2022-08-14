@@ -16,7 +16,9 @@
     },
     "scripts": {
         "bootstrap": "npx lerna bootstrap",
-        "build": "tsc --build --verbose",
+        "build": "tsc --build --verbose && lerna run post-build",
+        "rebuild": "npm run clean && npm run build",
+        "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
         "test": "lerna run test"
     },
     "repository": {

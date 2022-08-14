@@ -10,9 +10,10 @@ clear
 
 rm -rf dist
 npm run build
-node .
+npm run synth
+npm run deploy
 
-(cd cdktf.out/stacks/dorc-implmementation/ && terraform init && terraform apply -auto-approve )
+# (cd cdktf.out/stacks/dorc-implmementation/ && terraform init && terraform apply -auto-approve )
 
 sleep 5
 

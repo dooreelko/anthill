@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const findBuildContextRoot = () => {
-    const startPath = __dirname;
+export const findBuildContextRoot = (startPath: string) => {
     const pathParts = startPath.split(path.sep);
 
     for (let i = pathParts.length; i >= 0; i--) {

@@ -2,7 +2,7 @@
 import {
     DockerStates, Queue, KeyValueStore,
     Autoscaler, ContainerStateEvent, ContainerRuntime,
-    Func, Api, TaskUid, QueuePoller, Topic, EntryHistory
+    Func, Api, DockerTaskUid, QueuePoller, Topic, KeyValueEntryHistory
 } from "@anthill/core";
 
 /** SOLUTION DESIGN */
@@ -75,7 +75,7 @@ export const apiRunTask = new Api<TaskSubmissionRequest, Task>({
 
 export const runTaskFunction = new Func<Task>({
     code: async t => {
-        let uid: TaskUid;
+        let uid: DockerTaskUid;
         try {
             const response = await containerRuntime.run.exec({
                 labels: {
@@ -122,8 +122,8 @@ export const apiGetTask = new Api<{ id: string }, Task | undefined>({
     target: getTaskFunction
 });
 
-export const apiGetTaskHistory = new Api<{ id: string }, EntryHistory<Task> | undefined>({
-    target: new Func<{ id: string }, EntryHistory<Task> | undefined>({
+export const apiGetTaskHistory = new Api<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
+    target: new Func<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
         code: (id) => taskStore.history.exec(id)
     })
 });

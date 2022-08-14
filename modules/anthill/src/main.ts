@@ -64,7 +64,7 @@ export class ArchTopic<T> implements Partial<ITopic<T>> {
 
 export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
-export type EntryHistory<T> = (T & { when: Date })[];
+export type KeyValueEntryHistory<T> = (T & { when: Date })[];
 
 export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
     list: Api<void, T[]>;
@@ -72,7 +72,7 @@ export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: 
     find: Api<Partial<T>, T | undefined>;
     delete: Api<TKey, boolean>;
     put: Api<T, T>;
-    history: Api<{ id: TKey }, EntryHistory<T> | undefined>;
+    history: Api<{ id: TKey }, KeyValueEntryHistory<T> | undefined>;
 };
 
 export const KeyValueStore = <TKey, TVal>() => Graduate<IKeyValueStore<TKey, TVal>>();
@@ -128,7 +128,7 @@ export class ApiServer {
     }
 
     constructor(public props: ApiServerProps, runner: () => void) {
-        runtimeRegistry.set(props.name, runner)
+        runtimeRegistry().set(props.name, runner)
         ApiServer.registry.set(props.name, props);
         props.listener.apis
             .map(def => ({ id: def.api.uid, apiName: props.name }))
@@ -156,7 +156,7 @@ export type ContainerStateEvent<TLabels extends string> = {
     labels?: Partial<Record<TLabels, string>>;
 };
 
-export type TaskUid = string;
+export type DockerTaskUid = string;
 
 export type DockerRun<TLabels extends string> = {
     labels: Partial<Record<TLabels, string>>,
@@ -168,8 +168,8 @@ export interface IContainerRuntime<TLabels extends string> {
     autoscaler: IAutoscaler;
     stateChangeTopic: ITopic<ContainerStateEvent<TLabels>>;
 
-    run: Api<DockerRun<TLabels>, { uid: TaskUid } | { error: any }>;
-    logs: Api<{ uid: TaskUid }, string[]>;
+    run: Api<DockerRun<TLabels>, { uid: DockerTaskUid } | { error: any }>;
+    logs: Api<{ uid: DockerTaskUid }, string[]>;
 };
 
 export const ContainerRuntime = <TLabels extends string>() => Graduate<IContainerRuntime<TLabels>>();

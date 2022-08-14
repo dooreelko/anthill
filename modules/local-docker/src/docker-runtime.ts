@@ -2,7 +2,6 @@ import Docker = require('dockerode');
 import JSONStream = require('pixl-json-stream');
 import { EventEmitter } from 'stream';
 import * as maxim from '@anthill/core';
-import { DockerRun } from '@anthill/core';
 import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
@@ -111,7 +110,7 @@ export class DockerRuntime<TLabels extends string> extends maxim.Selfed<maxim.IC
         });
     };
 
-    private _run = async (input: DockerRun<TLabels>) => {
+    private _run = async (input: maxim.DockerRun<TLabels>) => {
         return this.docker.run(input.image, input.cmd, process.stdout, {
             labels: input.labels
         })
@@ -132,7 +131,7 @@ export class DockerRuntime<TLabels extends string> extends maxim.Selfed<maxim.IC
             });
     };
 
-    private _logs = (task: { uid: maxim.TaskUid }) => {
+    private _logs = (task: { uid: maxim.DockerTaskUid }) => {
         const localId = this.containerLocalId(task);
         return this.docker.getContainer(localId).logs({
             stdout: true,
@@ -160,13 +159,13 @@ export class DockerRuntime<TLabels extends string> extends maxim.Selfed<maxim.IC
     }
 
     run = new HttpApi({
-        target: new maxim.Func<DockerRun<TLabels>, { uid: maxim.TaskUid } | { error: any }>({
+        target: new maxim.Func<maxim.DockerRun<TLabels>, { uid: maxim.DockerTaskUid } | { error: any }>({
             code: this._run
         })
     });
 
-    logs = new HttpApi<{ uid: maxim.TaskUid }, string[]>({
-        target: new maxim.Func<{ uid: maxim.TaskUid }, string[]>({
+    logs = new HttpApi<{ uid: maxim.DockerTaskUid }, string[]>({
+        target: new maxim.Func<{ uid: maxim.DockerTaskUid }, string[]>({
             code: this._logs
         })
     });

@@ -6,7 +6,13 @@
             "path": "./modules/anthill/tsconfig.json"
         },
         {
-            "path": "./modules/dorc/tsconfig.json"
+            "path": "./modules/local-docker/tsconfig.json"
+        },
+        {
+            "path": "./modules/demos/dorc/tsconfig.json"
+        },
+        {
+            "path": "./modules/demos/hello-world/tsconfig.json"
         }
     ]
 }

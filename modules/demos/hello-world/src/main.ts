@@ -10,7 +10,7 @@ export const build = () => {
     }
 
     const app = new App();
-    const stack = new DorcStack(app, "dorc-implmementation");
+    const stack = new DorcStack(app, "anthill-hello-world");
 
     buildLocal(stack);
 

@@ -13,3 +13,5 @@ cdktf.log
 .terraform
 tsconfig.tsbuildinfo
 dist
+
+*.log

@@ -4,5 +4,5 @@ COPY . /var/app/
 
 WORKDIR /var/app/
 
-ENTRYPOINT ["node", "/var/app/src/run.js"]
+ENTRYPOINT ["node", "/var/app/dist/src/run.js"]
 

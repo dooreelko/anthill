@@ -152,7 +152,7 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
     });
 
     history = new HttpApi({
-        target: new maxim.Func<{ id: TKey }, maxim.EntryHistory<T> | undefined>({
+        target: new maxim.Func<{ id: TKey }, maxim.KeyValueEntryHistory<T> | undefined>({
             code: this._history
         })
     });

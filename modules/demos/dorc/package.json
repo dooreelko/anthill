@@ -5,10 +5,10 @@
     "main": "dist/src/main.js",
     "scripts": {
         "get": "cdktf get",
-        "build": "tsc && npm run post-build:docker && npm run post-build:npm",
-        "post-build:docker": "find ./src -iname '*dockerfile' -exec cp '{}' './dist/{}' ';'",
-        "post-build:npm": "lerna bootstrap --scope ${npm_package_name} -- --omit=dev && cp --recursive --dereference node_modules dist && cp package.json dist",
+        "build": "tsc && npm run post-build:npm",
+        "post-build:npm": "lerna bootstrap --scope ${npm_package_name} -- --omit=dev && cp --recursive --dereference node_modules dist || lerna bootstrap --scope ${npm_package_name}",
         "synth": "cdktf synth",
+        "deploy": "cdktf deploy --auto-approve",
         "compile": "tsc --pretty && npm run post-build",
         "watch": "tsc --watch --pretty && npm run post-build",
         "test": "jest",
@@ -27,22 +27,11 @@
     },
     "dependencies": {
         "@anthill/core": "*",
+        "@anthill/local-docker": "*",
         "@cdktf/provider-docker": "^0.8.36",
         "@cdktf/provider-null": "^0.7.35",
         "cdktf": "^0.11.2",
-        "constructs": "^10.1.48",
-        "dockerode": "^3.3.2",
-        "koa": "^2.13.4",
-        "koa-body": "^5.0.0",
-        "koa-logger": "^3.2.1",
-        "node-fetch": "2.6.7",
-        "pixl-json-stream": "^1.0.7"
+        "constructs": "^10.1.48"
     },
-    "devDependencies": {
-        "@types/dockerode": "^3.3.9",
-        "@types/koa": "^2.13.5",
-        "@types/koa__router": "^8.0.11",
-        "@types/koa-logger": "^3.1.2",
-        "@types/node-fetch": "^2.6.2"
-    }
+    "devDependencies": {}
 }
