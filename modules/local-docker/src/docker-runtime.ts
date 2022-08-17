@@ -6,7 +6,13 @@ import { HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
-export class DummyAutoscaler implements maxim.IAutoscaler {
+export class DummyAutoscaler implements maxim.IAutoscaler, maxim.Archetype {
+    kind = 'Dummy autoscaler';
+    name = '';
+
+    get relations(): maxim.Relation[] {
+        return [];
+    }
     get nodeCount(): number {
         return 1;
     }

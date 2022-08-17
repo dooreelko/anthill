@@ -2,13 +2,38 @@ import { randomUUID } from "crypto";
 import { Graduate } from "./gradual";
 import { runtimeRegistry } from "./runtime";
 
-export class Api<TIn, TOut> {
+export type Relation = {
+    who: Archetype;
+    what: string;
+    whom: Archetype;
+};
+
+export interface Archetype {
+    kind: string;
+    name?: string;
+
+    get relations(): Relation[];
+}
+
+export class Api<TIn, TOut> implements Archetype {
     public readonly uid: string;
 
     constructor(public readonly init: {
         target: Func<TIn, TOut> | IQueue<TIn>;
-    }) {
+    } & { name?: string }) {
         this.uid = randomUUID();
+        this.name = init.name || '';
+    }
+
+    public kind = 'API';
+    public name: string;
+
+    get relations(): Relation[] {
+        return [{
+            who: this,
+            what: 'calls',
+            whom: this.init.target
+        }];
     }
 
     exec(arg: TIn): TOut | Promise<TOut> {
@@ -27,15 +52,21 @@ export class Api<TIn, TOut> {
 
 export type QueueUid<TUid> = { queueUid: TUid };
 
-export interface IQueue<T extends Object, TUid = string> {
+export interface IQueue<T extends Object, TUid = string> extends Archetype {
     put: Api<T, void>;
     poll: Api<number | undefined, (T & QueueUid<TUid>)[]>;
     markDone: Api<TUid | TUid[], void>;
 };
 
-export const Queue = <T, TUid = string>() => Graduate<IQueue<T, TUid>>();
+export const Queue = <T, TUid = string>() => Graduate<IQueue<T, TUid>>({
+    kind: 'Queue',
+    get relations(): Relation[] {
+        return [];
+    }
 
-export interface IQueuePoller<T, TUid = string> {
+});
+
+export interface IQueuePoller<T, TUid = string> extends Archetype {
     queue: IQueue<T, TUid>;
     poller: Func<T, void>;
 
@@ -44,7 +75,7 @@ export interface IQueuePoller<T, TUid = string> {
 
 export const QueuePoller = <T>() => Graduate<IQueuePoller<T>>();
 
-export interface ITopic<T> {
+export interface ITopic<T> extends Archetype {
     readonly theSubs: (Api<T, void> | Func<T, void>)[];
 
     subscribe: Api<Api<T, void> | Func<T, void>, void>;
@@ -66,7 +97,7 @@ export const Topic = <T>() => Graduate<ITopic<T>>(new ArchTopic<T>());
 
 export type KeyValueEntryHistory<T> = (T & { when: Date })[];
 
-export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> {
+export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: TKey }> extends Archetype {
     list: Api<void, T[]>;
     get: Api<{ id: TKey }, T | undefined>;
     find: Api<Partial<T>, T | undefined>;
@@ -77,10 +108,30 @@ export interface IKeyValueStore<TKey = string, T extends { id?: TKey } = { id?: 
 
 export const KeyValueStore = <TKey, TVal>() => Graduate<IKeyValueStore<TKey, TVal>>();
 
-export class Func<TIn = undefined, TOut = void>  {
+export class Func<TIn = undefined, TOut = void> implements Archetype {
     constructor(public init: {
         code: (input: TIn) => TOut | Promise<TOut>
-    }) { };
+    } & { name?: string, relation?: Partial<Relation> }) {
+        this.name = init.name || '';
+    };
+
+    public kind = 'Function';
+    public name: string;
+
+    get relations(): Relation[] {
+        return this.init.relation ? [
+            {
+                who: this,
+                what: '?',
+                whom: {
+                    kind: 'unknown',
+                    name: 'unknown',
+                    relations: []
+                },
+                ...this.init.relation
+            }
+        ] : [];
+    }
 
     exec = (input: TIn) => this.init.code(input);
 };
@@ -137,7 +188,7 @@ export class ApiServer {
 };
 
 
-export interface IAutoscaler {
+export interface IAutoscaler extends Archetype {
     get nodeCount(): number;
     set nodeCount(newCount: number);
 
@@ -164,7 +215,7 @@ export type DockerRun<TLabels extends string> = {
     cmd: string[];
 };
 
-export interface IContainerRuntime<TLabels extends string> {
+export interface IContainerRuntime<TLabels extends string> extends Archetype {
     autoscaler: IAutoscaler;
     stateChangeTopic: ITopic<ContainerStateEvent<TLabels>>;
 

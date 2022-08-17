@@ -1,0 +1,30 @@
+{
+    "name": "@anthill/vis",
+    "version": "1.0.0",
+    "description": "@anthill's architecture visualiser",
+    "main": "dist/src/main.js",
+    "scripts": {
+        "build": "tsc",
+        "compile": "tsc --pretty",
+        "watch": "tsc --watch --pretty",
+        "test": "jest",
+        "test:watch": "jest --watch"
+    },
+    "dependencies": {
+        "@anthill/core": "*",
+        "@hpcc-js/wasm": "^1.15.0",
+        "rougher": "^1.1.2",
+        "roughjs": "^4.5.2",
+        "viz.js": "^2.1.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dooreelko/dorc.git"
+    },
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/dooreelko/dorc/issues"
+    },
+    "homepage": "https://github.com/dooreelko/dorc#readme"
+}

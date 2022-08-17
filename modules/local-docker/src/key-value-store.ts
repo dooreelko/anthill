@@ -6,7 +6,7 @@ import { DockerServerInit } from './tools';
 
 export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = { id?: TKey }>
     extends maxim.Selfed<maxim.IKeyValueStore<TKey, T>>
-    implements maxim.IKeyValueStore<TKey, T> {
+    implements maxim.IKeyValueStore<TKey, T>, maxim.Archetype {
     private theStore = new Map<TKey, T>();
     private theStoreHistory = new Map<TKey, (T & { when: Date })[]>();
 
@@ -68,6 +68,11 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         };
 
         new maxim.ApiServer(server, () => run(server));
+    }
+    kind = 'Docker KV store';
+    name = '';
+    get relations(): maxim.Relation[] {
+        throw new Error('Method not implemented.');
     }
 
     _list = () => [...this.theStore.values()];

@@ -33,5 +33,7 @@
         "cdktf": "^0.11.2",
         "constructs": "^10.1.48"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "@anthill/vis": "*"
+    }
 }

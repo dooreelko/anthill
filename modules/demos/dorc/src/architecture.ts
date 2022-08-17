@@ -41,22 +41,34 @@ const DorcContainerRuntime = ContainerRuntime<DockerLabels>();
 
 // Architectural entities
 
-export const taskQueue = new TaskQueue();
+export const taskQueue = new TaskQueue({
+    name: 'task queue'
+});
 
-export const taskStore = new TaskKeyValueStore();
+export const taskStore = new TaskKeyValueStore({
+    name: 'task store'
+});
 
-export const scaler = new DorcAutoscaler();
+export const scaler = new DorcAutoscaler({
+    name: 'autoscaler'
+});
 
-export const containerStateTopic = new ContainerStateEventTopic();
+export const containerStateTopic = new ContainerStateEventTopic({
+    name: 'container state topic'
+});
 
-export const taskStateTopic = new TaskTopic();
+export const taskStateTopic = new TaskTopic({
+    name: 'task state topic'
+});
 
 export const containerRuntime = new DorcContainerRuntime({
     stateChangeTopic: containerStateTopic,
-    autoscaler: scaler
+    autoscaler: scaler,
+    name: 'container runtime'
 });
 
 export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
+    name: 'submit task',
     code: async (request: TaskSubmissionRequest) => {
         const task = await taskStore.put.exec({
             state: 'queued',
@@ -70,10 +82,12 @@ export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
 });
 
 export const apiRunTask = new Api<TaskSubmissionRequest, Task>({
+    name: 'submit task api',
     target: submitTaskFunction
 });
 
 export const runTaskFunction = new Func<Task>({
+    name: 'run task',
     code: async t => {
         let uid: DockerTaskUid;
         try {
@@ -102,33 +116,46 @@ export const runTaskFunction = new Func<Task>({
 });
 
 export const taskQueuePoller = new TaskQueuePoller({
+    name: 'task queue poller',
+    relations: [{
+        who: taskQueue,
+        what: 'calls',
+        whom: runTaskFunction
+    }],
     queue: taskQueue,
     poller: runTaskFunction
 });
 
 export const listTasksFunction = new Func<unknown, Task[]>({
+    name: 'list tasks',
     code: () => taskStore.list.exec()
 });
 
 export const apiListTasks = new Api<unknown, Task[]>({
+    name: 'list tasks api',
     target: listTasksFunction
 });
 
 export const getTaskFunction = new Func<{ id: string }, Task | undefined>({
+    name: 'get task',
     code: (id) => taskStore.get.exec(id)
 });
 
 export const apiGetTask = new Api<{ id: string }, Task | undefined>({
+    name: 'get task api',
     target: getTaskFunction
 });
 
 export const apiGetTaskHistory = new Api<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
+    name: 'get task history api',
     target: new Func<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
+        name: 'get task history',
         code: (id) => taskStore.history.exec(id)
     })
 });
 
 export const apiGetTaskLogs = new Api<{ id: string }, string[]>({
+    name: 'get task logs api',
     target: new Func<{ id: string }, string[]>({
         code: async (id) => {
             const task = await taskStore.get.exec(id);
@@ -151,6 +178,7 @@ export const apiGetTaskLogs = new Api<{ id: string }, string[]>({
 });
 
 export const taskStateFunction = new Func<ContainerStateEvent<DockerLabels>, void>({
+    name: 'update task state',
     code: async e => {
         const announce = async (newTask: Task) => {
             console.log('will save and announce', newTask);
@@ -209,7 +237,13 @@ export const taskStateFunction = new Func<ContainerStateEvent<DockerLabels>, voi
             console.error('failed updating task', e);
         }
 
+    },
+    relation: {
+        // who: taskStateFunction,
+        what: 'subscribed to',
+        whom: containerStateTopic
     }
+
 });
 
 containerStateTopic.subscribe.localExec(taskStateFunction);
