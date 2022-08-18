@@ -15,6 +15,7 @@
         "@hpcc-js/wasm": "^1.15.0",
         "rougher": "^1.1.2",
         "roughjs": "^4.5.2",
+        "ts-morph": "^15.1.0",
         "viz.js": "^2.1.2"
     },
     "repository": {

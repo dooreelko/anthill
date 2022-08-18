@@ -1,69 +1,53 @@
-import * as maxim from '@anthill/core';
+import { Identifier, NewExpression, Node, Project, ReferencedSymbol, ts, VariableDeclaration } from "ts-morph";
 import { graphviz } from '@hpcc-js/wasm';
-// import { Config } from "roughjs/core";
 import roughUp from "rougher";
 
-/**
- * This helper function produces an SVG of the architecure
- */
-export const draw = (arch: maxim.Archetype[]) => {
-    const lay = `
-    digraph G {
-        node [shape=rect];
 
-        subgraph cluster_0 {
-            style=filled;
-            color=lightgrey;
-            node [style=filled,color=white];
-            a0 -> a1 -> a2 -> a3;
-            label = "Hello";
-        }
+const project = new Project();
+project.addSourceFilesAtPaths(process.argv.slice(2));
 
-        subgraph cluster_1 {
-            node [style=filled];
-            b0 -> b1 -> b2 -> b3;
-            label = "World";
-            color=blue
-        }
+const collectChildren: (n: Node) => Node[] = (n: Node) => {
+    return [n, ...n.getChildren().flatMap(collectChildren)]
+}
 
-        start -> a0;
-        start -> b0;
-        a1 -> b3;
-        b2 -> a3;
-        a3 -> a0;
-        a3 -> end;
-        b3 -> end;
+const news = project.getSourceFiles()
+    .flatMap(f => collectChildren(f))
+    .filter(n => n.isKind(ts.SyntaxKind.NewExpression)) as NewExpression[];
 
-        start [shape=Mdiamond];
-        end [shape=Msquare];
-    }
-`;
+const getParentVarDeclaration = (n: Node) => n
+    .getAncestors()
+    .filter(ans => ans.isKind(ts.SyntaxKind.VariableDeclaration)) as VariableDeclaration[];
 
-    const options = {
-        fillStyle: 'solid'
-    };
+const newDeclarations = news.map(n => {
+    const parentVar = [...getParentVarDeclaration(n), undefined][0];
 
-    const nodeUid = (arc: maxim.Archetype) => `${arc.kind} | ${arc.name}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
+    const refs = parentVar?.findReferencesAsNodes()
+        .flatMap(r => getParentVarDeclaration(r));
 
-    const namesKV = arch.map(a => [`${nodeUid(a)}`, a] as [string, maxim.Archetype]);
+    return [
+        parentVar?.getName() || '<inline>',
+        n.getChildrenOfKind(ts.SyntaxKind.Identifier).map(c => c.getText())[0],
+        (refs || []).map(r => r.getName()),
+    ] as [string, string, string[]]
+});
 
-    console.error(namesKV);
+console.error(newDeclarations);
 
-    const nameMap = new Map<string, maxim.Archetype>(
-        namesKV
-    );
+const nodeUid = (node: [string, string, string[]]) => `${node[0]} | ${node[1]}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
 
-    const archDot = arch
-        .map(a => `${nodeUid(a)} [label="${a.name}"];`)
-        .join('\n')
+const archDot = newDeclarations.map(d => `${nodeUid(d)} [label="${d[0]}"];`)
+    .join('\n');
 
-    const archRels = arch.map(a => a.relations
-        .map(r => `${nodeUid(r.who)} -> ${nodeUid(r.whom)};`)
-        .join('\n')
+const nameMap = new Map(newDeclarations.map(d => [d[0], d]));
 
-    ).join('\n')
+const archRels = newDeclarations
+    .filter(d => d[2].length)
+    .flatMap(d => d[2]
+        .filter(from => nameMap.has(from))
+        .map(from => `${nodeUid(nameMap.get(from)!)} -> ${nodeUid(d)}`)
+    ).join('\n');
 
-    const lay2 = `
+const lay2 = `
     digraph G {
         node [shape=rect];
         splines=ortho;
@@ -76,10 +60,16 @@ export const draw = (arch: maxim.Archetype[]) => {
     }
     `;
 
-    console.error(lay2);
+console.error(lay2);
 
-    graphviz
-        .layout(lay2, 'svg', 'dot', {})
-        .then(svg => console.log(roughUp(svg, options)))
-        .catch(console.error)
+const options = {
+    fillStyle: 'solid'
 };
+
+graphviz
+    .layout(lay2, 'svg', 'dot', {})
+    .then(svg => console.log(roughUp(svg, options)))
+    .catch(console.error)
+
+
+export * from './draw';
