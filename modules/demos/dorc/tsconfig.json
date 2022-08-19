@@ -7,6 +7,9 @@
     "references": [
         {
             "path": "../../anthill/tsconfig.json"
+        },
+        {
+            "path": "../../local-docker/tsconfig.json"
         }
     ],
     "include": [

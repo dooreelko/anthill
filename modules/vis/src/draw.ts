@@ -39,47 +39,47 @@ export const draw = (arch: maxim.Archetype[]) => {
     }
 `;
 
-    const options = {
-        fillStyle: 'solid'
-    };
+    // const options = {
+    //     fillStyle: 'solid'
+    // };
 
-    const nodeUid = (arc: maxim.Archetype) => `${arc.kind} | ${arc.name}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
+    // const nodeUid = (arc: maxim.Archetype) => `${arc.kind} | ${arc.name}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
 
-    const namesKV = arch.map(a => [`${nodeUid(a)}`, a] as [string, maxim.Archetype]);
+    // const namesKV = arch.map(a => [`${nodeUid(a)}`, a] as [string, maxim.Archetype]);
 
-    console.error(namesKV);
+    // console.error(namesKV);
 
-    const nameMap = new Map<string, maxim.Archetype>(
-        namesKV
-    );
+    // const nameMap = new Map<string, maxim.Archetype>(
+    //     namesKV
+    // );
 
-    const archDot = arch
-        .map(a => `${nodeUid(a)} [label="${a.name}"];`)
-        .join('\n')
+    // const archDot = arch
+    //     .map(a => `${nodeUid(a)} [label="${a.name}"];`)
+    //     .join('\n')
 
-    const archRels = arch.map(a => a.relations
-        .map(r => `${nodeUid(r.who)} -> ${nodeUid(r.whom)};`)
-        .join('\n')
+    // const archRels = arch.map(a => a.relations
+    //     .map(r => `${nodeUid(r.who)} -> ${nodeUid(r.whom)};`)
+    //     .join('\n')
 
-    ).join('\n')
+    // ).join('\n')
 
-    const lay2 = `
-    digraph G {
-        node [shape=rect];
-        splines=ortho;
-        rankdir=LR;
-        scale=50;
+    // const lay2 = `
+    // digraph G {
+    //     node [shape=rect];
+    //     splines=ortho;
+    //     rankdir=LR;
+    //     scale=50;
 
-        ${archDot}
-        
-        ${archRels}
-    }
-    `;
+    //     ${archDot}
 
-    console.error(lay2);
+    //     ${archRels}
+    // }
+    // `;
 
-    graphviz
-        .layout(lay2, 'svg', 'dot', {})
-        .then(svg => console.log(roughUp(svg, options)))
-        .catch(console.error)
+    // console.error(lay2);
+
+    // graphviz
+    //     .layout(lay2, 'svg', 'dot', {})
+    //     .then(svg => console.log(roughUp(svg, options)))
+    //     .catch(console.error)
 };

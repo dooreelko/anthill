@@ -8,11 +8,10 @@ export type Relation = {
     whom: Archetype;
 };
 
+/**
+ * Market interface for anthill entities
+ */
 export interface Archetype {
-    kind: string;
-    name?: string;
-
-    get relations(): Relation[];
 }
 
 export class Api<TIn, TOut> implements Archetype {
@@ -59,11 +58,6 @@ export interface IQueue<T extends Object, TUid = string> extends Archetype {
 };
 
 export const Queue = <T, TUid = string>() => Graduate<IQueue<T, TUid>>({
-    kind: 'Queue',
-    get relations(): Relation[] {
-        return [];
-    }
-
 });
 
 export interface IQueuePoller<T, TUid = string> extends Archetype {
@@ -155,7 +149,7 @@ export type ApiServerProps = {
     listener: ApiServerListener;
 };
 
-export class ApiServer {
+export class ApiServer implements Archetype {
     static registry = new Map<string, ApiServerProps>;
     static endpointRegistry = new Map<string, string>;
 

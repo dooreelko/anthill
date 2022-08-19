@@ -41,30 +41,19 @@ const DorcContainerRuntime = ContainerRuntime<DockerLabels>();
 
 // Architectural entities
 
-export const taskQueue = new TaskQueue({
-    name: 'task queue'
-});
+export const taskQueue = new TaskQueue();
 
-export const taskStore = new TaskKeyValueStore({
-    name: 'task store'
-});
+export const taskStore = new TaskKeyValueStore();
 
-export const scaler = new DorcAutoscaler({
-    name: 'autoscaler'
-});
+export const scaler = new DorcAutoscaler();
 
-export const containerStateTopic = new ContainerStateEventTopic({
-    name: 'container state topic'
-});
+export const containerStateTopic = new ContainerStateEventTopic();
 
-export const taskStateTopic = new TaskTopic({
-    name: 'task state topic'
-});
+export const taskStateTopic = new TaskTopic();
 
 export const containerRuntime = new DorcContainerRuntime({
     stateChangeTopic: containerStateTopic,
-    autoscaler: scaler,
-    name: 'container runtime'
+    autoscaler: scaler
 });
 
 export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
@@ -116,12 +105,6 @@ export const runTaskFunction = new Func<Task>({
 });
 
 export const taskQueuePoller = new TaskQueuePoller({
-    name: 'task queue poller',
-    relations: [{
-        who: taskQueue,
-        what: 'calls',
-        whom: runTaskFunction
-    }],
     queue: taskQueue,
     poller: runTaskFunction
 });
