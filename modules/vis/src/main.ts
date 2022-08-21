@@ -216,12 +216,14 @@ rx.from(legend).pipe(
     const lay2 = `
     digraph G {
         node [shape=rect];
+        edge [color=black];
         splines=ortho;
         rankdir=LR;
         rank=same;
-        bgcolor="#00000000";
+        bgcolor="white";
 
         subgraph cluster_legend {
+            color=white
             edge [style=invis] 
 
             ${legendDef}
@@ -233,6 +235,7 @@ rx.from(legend).pipe(
         }
 
         subgraph cluster_arch {
+            color=white
             ${archDot}
             
             ${archRels}
@@ -244,7 +247,8 @@ rx.from(legend).pipe(
     console.error(lay2);
 
     const options = {
-        hachureGap: 1,
+        stroke: '#ffffff',
+        hachureGap: 0.5,
         fill: '#ffffff',
         fillStyle: 'hachure'
     };
