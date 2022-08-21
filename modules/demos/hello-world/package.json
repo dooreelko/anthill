@@ -19,7 +19,8 @@
         "test:watch": "jest --watch",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
         "upgrade:next": "npm i cdktf@next cdktf-cli@next",
-        "draw": "npm run build >&2 && node dist/src/vis.js"
+        "vis:arch": "vis tsconfig.json architecture.ts > hello-arch.svg",
+        "vis": "vis tsconfig.json > hello.svg"
     },
     "keywords": [
         "docker",

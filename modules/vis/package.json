@@ -3,9 +3,12 @@
     "version": "1.0.0",
     "description": "@anthill's architecture visualiser",
     "main": "dist/src/main.js",
+    "types": "dist/src/main.d.ts",
+    "bin": "dist/src/main.js",
     "scripts": {
-        "build": "tsc",
-        "compile": "tsc --pretty",
+        "build": "tsc && npm run post-build",
+        "compile": "tsc --pretty && npm run post-build",
+        "post-build": "chmod u+x ./dist/src/main.js",
         "watch": "tsc --watch --pretty",
         "test": "jest",
         "test:watch": "jest --watch"
@@ -15,6 +18,7 @@
         "@hpcc-js/wasm": "^1.15.0",
         "rougher": "^1.1.2",
         "roughjs": "^4.5.2",
+        "rxjs": "^7.5.6",
         "ts-morph": "^15.1.0",
         "viz.js": "^2.1.2"
     },

@@ -9,6 +9,9 @@
             "path": "./modules/local-docker/tsconfig.json"
         },
         {
+            "path": "./modules/vis/tsconfig.json"
+        },
+        {
             "path": "./modules/demos/dorc/tsconfig.json"
         },
         {

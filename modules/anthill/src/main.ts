@@ -135,6 +135,7 @@ export type ApiContext = {
     method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'OPTIONS' | 'DELETE'
 };
 
+// TODO: this is leaky - a lot of assumptions about HTTP
 export type ApiServerListener = {
     host: string;
     port: number;

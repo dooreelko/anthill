@@ -40,18 +40,17 @@ export const build = (stack: TerraformStack) => {
 
     const imageCtx = apiServerBuildContext(__dirname, 'api-server.Dockerfile');
 
-    const server = new Image(stack, 'hello-world-api-server', {
+    const dockerImage = new Image(stack, 'hello-world-api-server', {
         name: 'hello-world-api-server',
         buildAttribute: imageCtx
     });
 
-
     const name = `hello-world-${mainApi.init.name}`;
 
-    const cont = new Container(stack, name, {
-        dependsOn: [server],
+    const dockerContainer = new Container(stack, name, {
+        dependsOn: [dockerImage],
         name,
-        image: server.latest,
+        image: dockerImage.latest,
         attach: false,
         networkMode: 'host',
         ports: [{
@@ -64,6 +63,6 @@ export const build = (stack: TerraformStack) => {
     });
 
     new TerraformOutput(stack, `${mainApi.init.name}-id`, {
-        value: cont.id
+        value: dockerContainer.id
     });
 }

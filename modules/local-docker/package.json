@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "@anthill's naive primitives running as docker containers",
     "main": "dist/src/main.js",
+    "types": "dist/src/main.d.ts",
     "scripts": {
         "build": "tsc && npm run post-build",
         "post-build": "npm run post-build:docker",
