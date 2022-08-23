@@ -182,7 +182,10 @@ const nodeUid = (node: [string, string, string[]]) => `${node[0]} | ${node[1]}`.
 
 const kinds = newDeclarations.map(d => d[1]);
 
-const palette = ['#1abc9c', '#2ecc71', '#27ae60', '#3498db', '#2980b9', '#9b59b6', '#c1f909', '#34495e', '#0057e5', '#f1c40f', '#f39c12', '#e67e22', '#d35400', '#e74c3c', '#01bf70', '#ecf0f1', '#bdc3c7', '#95a5a6', '#7f8c8d', '#16a085'];
+const palette = [
+    '#3bfdea', '#62ffd1', '#88ffb5', '#aeff9b', '#d4fd83', '#f9f871', '#00ddf8',
+    '#00b9f4', '#6093d9', '#816cad', '#864a77', '#c2fcf3', '#8b0075', '#96b1ac',
+    '#81fd3b', '#00de79', '#e29c57', '#00ffff', '#7f8c8d', '#16a085'];
 
 const legend = [...new Set(kinds)]
     .map((kind, idx) => [kind, `${palette[idx % palette.length]}`]) as [string, string][];
