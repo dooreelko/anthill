@@ -149,6 +149,11 @@ const isinlinePropertyAssignmenet = (n: Node) => n
 const inlineId = (constructedClass: string) => `<i>${constructedClass}_${Math.ceil(Math.random() * 10000)}`;
 const isInlineId = (id: string) => id.startsWith('<i>');
 
+const toHuman = (name: string) => [...name]
+    .map(c => c.toUpperCase() === c ? ` ${c}` : c)
+    .join('')
+    .toLowerCase();
+
 const newDeclarations = news.map(n => {
     const parentVar = getParentVarDeclaration(n);
 
@@ -184,8 +189,8 @@ const kinds = newDeclarations.map(d => d[1]);
 
 const palette = [
     '#3bfdea', '#62ffd1', '#88ffb5', '#aeff9b', '#d4fd83', '#f9f871', '#00ddf8',
-    '#00b9f4', '#6093d9', '#816cad', '#864a77', '#c2fcf3', '#8b0075', '#96b1ac',
-    '#81fd3b', '#00de79', '#e29c57', '#00ffff', '#7f8c8d', '#16a085'];
+    '#00b9f4', '#6093d9', '#816cad', '#c2fcf3', '#96b1ac', '#81fd3b', '#00de79',
+    '#e29c57', '#00ffff', '#7f8c8d', '#16a085', '#864a77', '#8b0075'];
 
 const legend = [...new Set(kinds)]
     .map((kind, idx) => [kind, `${palette[idx % palette.length]}`]) as [string, string][];
@@ -203,7 +208,7 @@ rx.from(legend).pipe(
     rx.reduce((sofar, curr) => `${sofar}\n${curr}`)
 ).subscribe(legendRel => {
 
-    const archDot = newDeclarations.map(d => `${nodeUid(d)} [label="${isInlineId(d[0]) ? d[1] : d[0]}"; style=filled fillcolor="${colorMap.get(d[1])}" ]`)
+    const archDot = newDeclarations.map(d => `${nodeUid(d)} [label="${toHuman(isInlineId(d[0]) ? d[1] : d[0])}"; style=filled fillcolor="${colorMap.get(d[1])}" ]`)
         .join('\n');
 
     const nameMap = new Map(newDeclarations.map(d => [d[0], d]));
