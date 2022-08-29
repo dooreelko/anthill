@@ -1,3 +1,6 @@
+import { Api } from './main';
+
+// TODO: this seems to be docker/custom server specific
 export const runtimeRegistry = () => {
     const theGlobe = global as any as { runtimeRegistry: Map<string, () => void> };
 

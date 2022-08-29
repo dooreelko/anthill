@@ -4,6 +4,7 @@
 **/*.js
 !jest.config.js
 !setup.js
+!.eslintrc.js
 
 node_modules
 cdktf.out

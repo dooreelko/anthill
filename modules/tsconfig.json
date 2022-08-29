@@ -4,6 +4,7 @@
     "alwaysStrict": true,
     "charset": "utf8",
     "declaration": true,
+    "declarationMap": true,
     "experimentalDecorators": true,
     "inlineSourceMap": true,
     "inlineSources": true,
@@ -28,9 +29,6 @@
     "target": "ES2022",
     "incremental": true
   },
-  // "include": [
-  //   "**/*.ts"
-  // ],
   "exclude": [
     "**/node_modules",
     "**/cdktf.out",

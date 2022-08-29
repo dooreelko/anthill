@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "**/src/**/*.ts",
+        "**/test/**/*.ts"
+    ],
+    "exclude": [
+        "**/dist/**",
+        "**/build/**",
+        "**/node_modules/**",
+        "**/*.test.{js,jsx,ts,tsx}",
+        "**/*.spec.{js,jsx,ts,tsx}",
+        "**/config-overrides.js"
+    ]
+}

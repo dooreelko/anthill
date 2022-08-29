@@ -12,6 +12,12 @@
             "path": "./modules/vis/tsconfig.json"
         },
         {
+            "path": "./modules/tools/dep-copy/tsconfig.json"
+        },
+        {
+            "path": "./modules/tools/lambda-dist/tsconfig.json"
+        },
+        {
             "path": "./modules/demos/dorc/tsconfig.json"
         },
         {

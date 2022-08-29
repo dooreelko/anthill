@@ -1,6 +1,5 @@
 import path = require('path');
 import fetch from 'node-fetch';
-import { findBuildContextRoot } from "../tools";
 import * as maxim from '@anthill/core';
 import { enrichPath } from './app/main';
 
@@ -32,7 +31,8 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
             )
         };
 
-        const enrichedPath = enrichPath(thisDef.spec.path, arg);
+        const inputObject = (typeof arg === 'object' ? arg : {}) as Record<string, unknown>;
+        const enrichedPath = enrichPath(thisDef.spec.path, inputObject);
 
         console.log('Enriched', thisDef.spec.path, 'using', arg, 'into', enrichedPath);
         console.log('Calling api', (listener as any).name || listener, enrichedPath, fetchInit.body);
@@ -61,7 +61,7 @@ export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
  * @returns 
  */
 export const apiServerBuildContext = (startPath: string, dockerFile: string) => {
-    const contextRoot = findBuildContextRoot(startPath);
+    const contextRoot = maxim.findBuildContextRoot(startPath);
 
     console.error('*** build root', contextRoot);
     return {

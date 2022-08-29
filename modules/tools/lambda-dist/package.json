@@ -1,0 +1,33 @@
+{
+    "name": "@anthill/lambda-dist",
+    "version": "1.0.0",
+    "description": "@anthill's aws lambda/layer dist organizer",
+    "main": "dist/src/main.js",
+    "bin": "dist/src/main.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc && npm run post-build",
+        "compile": "tsc --pretty && npm run post-build",
+        "post-build": "chmod u+x ./dist/src/main.js",
+        "watch": "tsc --watch --pretty",
+        "test": "jest",
+        "lint": "eslint $npm_config_local_prefix",
+        "test:watch": "jest --watch"
+    },
+    "dependencies": {
+        "cpy": "^9.0.1"
+    },
+    "devDependencies": {
+        "@anthill/eslint-config": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dooreelko/dorc.git"
+    },
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/dooreelko/dorc/issues"
+    },
+    "homepage": "https://github.com/dooreelko/dorc#readme"
+}

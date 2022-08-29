@@ -70,10 +70,6 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         new maxim.ApiServer(server, () => run(server));
     }
     kind = 'Docker KV store';
-    name = '';
-    get relations(): maxim.Relation[] {
-        throw new Error('Method not implemented.');
-    }
 
     _list = () => [...this.theStore.values()];
 
@@ -126,7 +122,7 @@ export class DockerKeyValueStore<TKey extends string, T extends { id?: TKey } = 
         return newOne;
     };
 
-    list = new HttpApi({
+    list = new HttpApi<void, T[]>({
         target: new maxim.Func<void, T[]>({
             code: this._list
         })

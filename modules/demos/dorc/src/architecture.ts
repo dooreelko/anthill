@@ -57,7 +57,6 @@ export const containerRuntime = new DorcContainerRuntime({
 });
 
 export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
-    name: 'submit task',
     code: async (request: TaskSubmissionRequest) => {
         const task = await taskStore.put.exec({
             state: 'queued',
@@ -71,12 +70,10 @@ export const submitTaskFunction = new Func<TaskSubmissionRequest, Task>({
 });
 
 export const apiRunTask = new Api<TaskSubmissionRequest, Task>({
-    name: 'submit task api',
     target: submitTaskFunction
 });
 
 export const runTaskFunction = new Func<Task>({
-    name: 'run task',
     code: async t => {
         let uid: DockerTaskUid;
         try {
@@ -110,35 +107,28 @@ export const taskQueuePoller = new TaskQueuePoller({
 });
 
 export const listTasksFunction = new Func<unknown, Task[]>({
-    name: 'list tasks',
     code: () => taskStore.list.exec()
 });
 
 export const apiListTasks = new Api<unknown, Task[]>({
-    name: 'list tasks api',
     target: listTasksFunction
 });
 
 export const getTaskFunction = new Func<{ id: string }, Task | undefined>({
-    name: 'get task',
     code: (id) => taskStore.get.exec(id)
 });
 
 export const apiGetTask = new Api<{ id: string }, Task | undefined>({
-    name: 'get task api',
     target: getTaskFunction
 });
 
 export const apiGetTaskHistory = new Api<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
-    name: 'get task history api',
     target: new Func<{ id: string }, KeyValueEntryHistory<Task> | undefined>({
-        name: 'get task history',
         code: (id) => taskStore.history.exec(id)
     })
 });
 
 export const apiGetTaskLogs = new Api<{ id: string }, string[]>({
-    name: 'get task logs api',
     target: new Func<{ id: string }, string[]>({
         code: async (id) => {
             const task = await taskStore.get.exec(id);
@@ -161,7 +151,6 @@ export const apiGetTaskLogs = new Api<{ id: string }, string[]>({
 });
 
 export const taskStateFunction = new Func<ContainerStateEvent<DockerLabels>, void>({
-    name: 'update task state',
     code: async e => {
         const announce = async (newTask: Task) => {
             console.log('will save and announce', newTask);
@@ -220,13 +209,7 @@ export const taskStateFunction = new Func<ContainerStateEvent<DockerLabels>, voi
             console.error('failed updating task', e);
         }
 
-    },
-    relation: {
-        // who: taskStateFunction,
-        what: 'subscribed to',
-        whom: containerStateTopic
     }
-
 });
 
 containerStateTopic.subscribe.localExec(taskStateFunction);

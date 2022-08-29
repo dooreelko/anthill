@@ -1,0 +1,14 @@
+{
+    "name": "@anthill/eslint-config",
+    "version": "1.0.0",
+    "description": "",
+    "main": "eslintrc.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "peerDependencies": {
+        "eslint": ">= 3"
+    },
+    "author": "",
+    "license": "ISC"
+}
