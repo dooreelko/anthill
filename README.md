@@ -1,19 +1,77 @@
 # Anthill
 
-Library and an optional minimal runtime framework, for 
-a pluggable and refactorable Everything-As-A-Code  
-event-driven solution architecture, design, infrastructure 
+Anthill is a software engineering methodology, allowing for a runtime-agnostic, pluggable, iterative and refactorable Everything-As-A-Code solution architecture, design, infrastructure 
 and ... well, code.
 
-Before we jump into the nitty gritty, let's define some axioms.
+There's also a tiny library of primitives and runtime helpers.
+
+> If all you need is a quick start, jump straight to the [Hello world](#hello-world).
+
+
+Now that you're here, let's define some axioms.
 
 ### Solution Architecture
 High level description of components of the solution.
 
 ### Solution Design
-A concrete implementation of the architecture. One solution would
-normally have one architecture at any point in time, but multiple 
+A concrete implementation of the architecture. At any point in time, a solution would normally have one architecture, but could have multiple 
 designs.
+
+## Why
+
+### Separate business logic and implementation
+
+> Theoretically, there's no difference between theory and practice.
+Practically, there is.
+
+By separating architecture and design, we allow for a clear-cut segregation between what a solution needs to be doing (its business logic) and how it's doing it.
+
+Common sense so far.
+
+### Decide only when it's necessary
+
+Still, this liberates us from the need of making early costly decisions; decisions that could be done later in the project's lifecycle.
+
+From an architect's point of view it doesn't matter whether an API is served from an AKS, AWS Api Gateway or a Raspberry Pi plugged next to my TV.
+
+Furthermore, I believe we've reached sufficient level of code portability and "fetch a record by ID and return it as JSON" doesn't need to know where it's running and what the record storage exactly is. We can abstract that away and decide those details later.
+
+### Carefully embrace imperfection of abstraction 
+
+One of the pitfalls of the agnostic abstraction is an attempt to avoid leaky abstractions.
+
+For any non-trivial use case, this doesn't work.
+
+Surprisingly, most solutions these days chose either a complete abstraction or no-abstraction. The hybrids are rare and awkward (deploying lambda functions using k8s controllers, really?).
+
+#### No-abstraction camp
+
+The no-abstraction camp simply makes an early decision on the target stack and works with that directly. An example would be completely separate iOS and Android applications for the same product, or solutions designed to explicitly run on AWS, Azure or GCP.
+
+This approach has the advantage of maximally utilising the target platform.
+
+The main drawback is that a solution, designed, for instance, with AWS services in mind, is not immediately convertible to Azure. And it costs to develop same thing several times.
+
+Effectively, this is the sweet vendor lock-in. Sweet, for the vendor.
+
+#### The full abstraction camp
+
+The examples here are Kubernetes, React Native, Electron, etc.
+This is the opposite side of the spectrum, where the abstraction layer attempts to eliminate the platform differences.
+
+The vendor lock-in is solved, but one loses the advantages of vendor-specific services. 
+
+#### Anthill
+
+Anthill, on the other hand, takes a middle approach between the two camps. 
+> Only parts, relevant to the solution's architecture are minimally abstracted. 
+
+And it becomes possible thanks to the separation of architecture and design.
+In addition, since the abstractions are minimal, it's possible to fine tune them for a specific solution. One doesn't need a universal set of abstractions, that are correct for all cases.
+
+Furthermore, this allows refactoring architecture whenever necessary during the project's lifecycle.
+
+Enough theory. Let's code.
 
 ## Hello world
 
@@ -29,27 +87,40 @@ And the `hello func` will be something like this:
 () => ({ message: 'hello world' }
 ```
 
-What's interesting about this architecture so far is that is absolutely agnostic about how exactly is all that implemented: whether the API are gRPC or node js, running koa, returning JSON; whether it's running locally directly, or in a container; in a lambda function in AWS, in an Azure function, or in a virtual machine.
+What's interesting about this architecture so far is that it is absolutely agnostic about how exactly is all that implemented: whether the API are gRPC or node.js, running koa, returning JSON; whether it's running locally directly, or in a container; in a lambda function in AWS, in an Azure function, or in a virtual machine.
 
-_This is the main point of @Anthill - the architecture of a solution can be decoupled from the implementation. This will allow portability and architecture refactoring._
+_This is the main point of @Anthill - the architecture of a solution can be decoupled from the implementation. This will allow architecture refactoring and having multpile non-conflicting implmentations of the same architecture._
 
 Let's have a look at a complete architecture of the `hello-world`.
 
 ```typescript
+/** Data definitions */
+
+/**
+ * Input payload for the API
+ * */
+export type HelloInput = void;
+
+/**
+ * What the API returns
+ * */
+export type HelloOutput = { message: string }; 
+
+
+/** Architecture  */
+
 /**
  * A function that takes no input and returns a string message
  * */
-export const helloFunc = new Func<void, { message: string }>({
-    code: () => ({ message: 'hello world' }),
-    name: 'hello func'
+export const helloFunc = new Func<HelloInput, HelloOutput>({
+    code: () => ({ message: 'hello world' })
 });
 
 /**
  * An API that knows that it will call a function
  * */
-export const helloApi = new Api<void, { message: string }>({
-    target: helloFunc,
-    name: 'hello api'
+export const helloApi = new Api<HelloInput, HelloOutput>({
+    target: helloFunc
 });
 
 ```
@@ -60,7 +131,7 @@ By the way, since the architecture is described in typescript, this diagram:
 
 was generated by using typescript compiler API using `@anthill/vis` module. 
 
-And here's an example of slightly more elaborate architecture running locally using docker implementation (drawing is still a WIP).
+And here's an example of a slightly more elaborate architecture running locally using docker implementation (drawing is still a WIP).
 ![api diagram](./modules/demos/dorc/dorc.svg)
 
 Because we can.
@@ -118,10 +189,10 @@ My tool of choice to deploy infrastructure is [CDKTF](https://www.terraform.io/c
 Let's define the CDK stack.
 
 ```typescript
-class DorcStack extends TerraformStack {}
+class HelloStack extends TerraformStack {}
 
 const app = new App();
-const stack = new DorcStack(app, "anthill-hello-world");
+const stack = new HelloStack(app, "anthill-hello-world");
 ```
 
 And finally, the docker to run the server in
@@ -198,7 +269,7 @@ const dockerImage = new Image(stack, 'hello-world-api-server', {
 });
 ```
 
-it packages current application into an image, setting entrypoint to be `ENTRYPOINT ["node", "/var/app/dist/src/run.js"]`.
+it packages current application into an image, setting entry point to be `ENTRYPOINT ["node", "/var/app/dist/src/run.js"]`.
 
 The `run.js`, in turn, calls the architecture and implementation building (so that all `ApiServer`s register themselves in the runtime registry), and then picks the one to run, passed via the container's `CMD`:
 ```typescript
