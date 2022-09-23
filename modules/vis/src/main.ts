@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { CallExpression, NewExpression, Node, Project, SyntaxKind, ts, VariableDeclaration } from 'ts-morph';
+import { NewExpression, Project, SyntaxKind, ts } from 'ts-morph';
 import * as rx from 'rxjs';
 import { graphviz } from '@hpcc-js/wasm';
 import roughUp from 'rougher';
+import { collectChildren, first, getParentTypes, getParentVarDeclaration, getRootCallDeclaration, getRootVarDeclaration, nodeTypeName } from './gnomes';
 
 if (process.argv.length < 3) {
     console.error(`@anthill/vis. Generate solution diagrams from code.
@@ -22,114 +23,18 @@ project.addSourceFilesFromTsConfig(process.argv[2]);
 
 const checker = project.getTypeChecker();
 
-const collectChildren: (n: Node) => Node[] = (n: Node) => {
-    return [n, ...n.getChildren().flatMap(collectChildren)];
-};
-
-const squeezeType = (ttype: ts.Type) => {
-    const decs = (ttype.symbol.declarations ?? []) as ts.ClassLikeDeclarationBase[];
-    const valueDec = (ttype.symbol.valueDeclaration as ts.ClassLikeDeclarationBase);
-
-    const parents = [...decs, valueDec]
-        .filter(el => !!el)
-        .flatMap(dec => dec.heritageClauses
-            ?.flatMap(cl => cl.types))
-        .filter(el => !!el) as ts.ExpressionWithTypeArguments[];
-
-    const uberparents = parents?.flatMap(getParentTypes);
-
-    const referredTypes = (parents ?? [])
-        .flatMap(tt => tt.typeArguments?.map(getParentTypes) ?? [])
-        .flatMap(el => el);
-
-    return [
-        ...(parents ?? []).map(tt => tt.expression.getText()),
-        ...referredTypes,
-        ...(uberparents ?? [])
-    ];
-};
-
-// TODO: doesn't work
-const getVarType = (n: ts.Node) => {
-    if (n.kind !== ts.SyntaxKind.VariableDeclaration) {
-        return '<NOTVAR>';
-    }
-
-    const vartype = checker.compilerObject.getTypeAtLocation(n);
-
-    const maybeTypes = (vartype as any).types as ts.Type[] | undefined;
-    if (maybeTypes) {
-        return maybeTypes.flatMap(squeezeType)[0];
-    }
-
-    return '<NOSYMBOL>';
-};
-
-const getParentTypes: (n: ts.Node) => string[] = (n: ts.Node) => {
-    const ttype = checker.compilerObject.getTypeAtLocation(n);
-
-    if (!ttype.symbol) {
-        /**
-         * the awkward `new func()()` doesn't have a type, but we
-         * can try to extract one from the variable declaration
-         */
-        if (n.parent.kind !== ts.SyntaxKind.VariableDeclaration) {
-            return ['<NOSYMBOL>'];
-        }
-
-        return [getVarType(n.parent)];
-        // const vartype = checker.compilerObject.getTypeAtLocation(n.parent);
-
-        // const maybeTypes = (vartype as any).types as ts.Type[] | undefined;
-        // if (maybeTypes) {
-        //     return maybeTypes.flatMap(squeezeType);
-        // }
-
-        // return ['<NOSYMBOL>'];
-    }
-
-    const typeArgs = (n as any).typeArguments as ts.NodeArray<ts.TypeNode> | undefined;
-    const genericArgs = (typeArgs ?? []).flatMap(getParentTypes);
-
-    return [
-        ...squeezeType(ttype),
-        ...genericArgs
-    ];
-};
-
-const nodeTypeName = (n: Node) => {
-    const ttype = checker.getTypeAtLocation(n);
-
-    if (ttype.compilerType.symbol) {
-        return ttype.compilerType.symbol.escapedName as string;
-    }
-
-    const subsym = checker.compilerObject.getSymbolAtLocation(n.compilerNode);
-
-    if (subsym) {
-        return subsym.escapedName as string;
-    }
-
-    if (n.compilerNode.parent.kind === ts.SyntaxKind.VariableDeclaration) {
-        return getVarType(n.compilerNode.parent);
-    }
-
-    console.error('falling back for', n.compilerNode.getText());
-    return n.compilerNode.getText();
-};
-
 const news = project.getSourceFiles()
     .filter(f => fileFilters.size ? fileFilters.has(f.getBaseName()) : true)
     .flatMap(f => collectChildren(f))
     .filter(n => n.isKind(ts.SyntaxKind.NewExpression))
     .filter(n => {
-        const parentTypes = getParentTypes(n.compilerNode);
+        const parentTypes = getParentTypes(n.compilerNode, checker);
 
         const shallPass = parentTypes.includes('Archetype') ||
             !!parentTypes.find(el => el.includes('TerraformResource')) ||
             parentTypes.includes('<NOSYMBOL>');
 
-        console.error(nodeTypeName(n), shallPass, [...new Set(getParentTypes(n.compilerNode))]);
+        console.error(nodeTypeName(n, checker), shallPass, [...new Set(getParentTypes(n.compilerNode, checker))]);
 
         return shallPass;
     })
@@ -140,9 +45,9 @@ const news = project.getSourceFiles()
         //     ? ttype.compilerType.symbol.escapedName
         //     : el.compilerNode.getText();
 
-        const newedName = nodeTypeName(el);
+        const newedName = nodeTypeName(el, checker);
 
-        const parents = getParentTypes(el.compilerNode);
+        const parents = getParentTypes(el.compilerNode, checker);
 
         console.error(
             newedName,
@@ -154,17 +59,6 @@ const news = project.getSourceFiles()
 
         return el;
     }) as NewExpression[];
-
-const getRootVarDeclaration = (n: Node) => n
-    .getAncestors()
-    .filter(ans => ans.isKind(ts.SyntaxKind.VariableDeclaration)) as VariableDeclaration[];
-
-const getRootCallDeclaration = (n: Node) => n
-    .getAncestors()
-    .filter(ans => ans.isKind(ts.SyntaxKind.CallExpression)) as CallExpression[];
-
-const getParentVarDeclaration = (n: Node) => n
-    .getParentIfKind(ts.SyntaxKind.VariableDeclaration);
 
 const inlineId = (constructedClass: string) => `<i>${constructedClass}_${Math.ceil(Math.random() * 10000)}`;
 const isInlineId = (id: string) => id.startsWith('<i>');
@@ -193,30 +87,50 @@ const newDeclarations = news.map(n => {
         .map(c => c.getText())
         .filter(el => !!el) as string[] ?? [];
 
+    const calls2 = parentVar?.findReferencesAsNodes()
+        .flatMap(r => getRootCallDeclaration(r) ?? [])
+        .filter(el => !!el)
+        .flatMap(c => ({
+            who: c.getParent()?.getChildrenOfKind(SyntaxKind.Identifier),
+            how: c.getChildrenOfKind(SyntaxKind.Identifier)
+        }))
+        .map(({ who, how }) => ({
+            who: first(who)?.getSymbol()?.getName(),
+            how: how.map(h => h.getText())
+        })) ?? [];
+
     console.error(calls);
 
-    const constructedClass = nodeTypeName(n);
+    const constructedClass = nodeTypeName(n, checker);
     // .getChildrenOfKind(ts.SyntaxKind.Identifier)
     // .map(c => c.getText())[0];
 
-    return [
-        parentVar?.getName() ?? inlineId(constructedClass),
-        constructedClass,
-        [
-            ...(refs ?? []).map(r => r.getName()),
-            ...calls
-        ]
-    ] as [string, string, string[]];
+    return {
+        name: parentVar?.getName() ?? inlineId(constructedClass),
+        class: constructedClass,
+        refs: [
+            ...new Set([
+                ...(refs ?? []).map(r => r.getName()),
+                ...calls
+            ])
+        ],
+        rels: {
+            refs: (refs ?? []).map(r => r.getName()),
+            calls,
+            calls2
+        }
+    };
 })
     // sort by class name so that Api will go first, etc
-    .sort((a, b) => (a[1] || '').localeCompare(b[1]));
+    .sort((a, b) => (a.class || '').localeCompare(b.class));
 
-const nodeUid = (node: [string, string, string[]]) => `${node[0]} | ${node[1]}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
+const nodeUid = (node: { name: string; class: string; refs: string[] }) =>
+    `${node.name} | ${node.class}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
 
-console.error(newDeclarations);
+console.error(JSON.stringify(newDeclarations, null, 2));
 
 const kinds = newDeclarations
-    .map(d => d[1])
+    .map(d => d.class)
     .filter(el => !!el);
 
 const palette = [
@@ -240,14 +154,14 @@ rx.from(legend).pipe(
     rx.reduce((sofar, curr) => `${sofar}\n${curr}`)
 ).subscribe(legendRel => {
     const archDot = newDeclarations
-        .map(d => `${nodeUid(d)} [label="${toHuman(isInlineId(d[0]) ? d[1] : d[0])}"; style=filled fillcolor="${colorMap.get(d[1]) ?? ''}" ]`)
+        .map(d => `${nodeUid(d)} [label="${toHuman(isInlineId(d.name) ? d.class : d.name)}"; style=filled fillcolor="${colorMap.get(d.class) ?? ''}" ]`)
         .join('\n');
 
-    const nameMap = new Map(newDeclarations.map(d => [d[0], d]));
+    const nameMap = new Map(newDeclarations.map(d => [d.name, d]));
 
     const archRels = newDeclarations
-        .filter(d => d[2].length)
-        .flatMap(d => d[2]
+        .filter(d => d.refs.length)
+        .flatMap(d => d.refs
             .filter(from => nameMap.has(from))
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map(from => `${nodeUid(nameMap.get(from)!)} -> ${nodeUid(d)}`)

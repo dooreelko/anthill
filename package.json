@@ -24,7 +24,7 @@
     },
     "scripts": {
         "bootstrap": "npx lerna bootstrap",
-        "build": "tsc --build --verbose && lerna run post-build",
+        "tsc": "tsc --build --verbose && lerna run post-build",
         "rebuild": "npm run clean && npm run build",
         "vis:all": "lerna run vis && lerna run vis:arch",
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",

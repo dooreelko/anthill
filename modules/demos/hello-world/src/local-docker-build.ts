@@ -1,37 +1,9 @@
-import * as arch from './architecture';
 import { TerraformStack, TerraformOutput } from 'cdktf';
 import { Container, DockerProvider, Image } from '@cdktf/provider-docker';
 
-import { ApiServer, ApiServerProps } from '@anthill/core';
-import { apiServerBuildContext, run } from '@anthill/local-docker';
+import { apiServerBuildContext } from '@anthill/local-docker';
 
-const mainApi = {
-    apiName: 'hello-world',
-    init: {
-        name: 'main',
-        port: 8080,
-        host: '127.0.0.10'
-    }
-};
-
-const mainServer: ApiServerProps = {
-    name: mainApi.apiName,
-    listener: {
-        host: mainApi.init.host,
-        port: mainApi.init.port,
-        apis: [
-            {
-                api: arch.helloApi,
-                spec: {
-                    method: 'GET',
-                    path: '/v1/hello'
-                }
-            }
-        ]
-    }
-};
-
-new ApiServer(mainServer, () => run(mainServer));
+import { mainApi } from './docker-architecture';
 
 /** CONCRETE SOLUTION IMPLEMENTATION */
 
