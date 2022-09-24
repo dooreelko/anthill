@@ -3,16 +3,8 @@ import * as arch from '@anthill/hello-world.architecture';
 
 /** CONCRETE SOLUTION IMPLEMENTATION */
 
-const mainApi = {
-    apiName: 'hello-world',
-    init: {
-        port: 8080,
-        host: '127.0.0.10'
-    }
-};
-
 export const mainServer: ApiServerProps = {
-    name: mainApi.apiName,
+    name: 'hello-world',
     listener: {
         apis: [
             {

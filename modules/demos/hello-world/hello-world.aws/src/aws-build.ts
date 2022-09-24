@@ -36,18 +36,18 @@ export const build = (stack: TerraformStack) => {
 
     const distDir = path.join(findBuildContextRoot(__dirname), 'dist');
 
-    const archiveLambdaLayer = new zip.DataArchiveFile(stack, 'lambda-layer-zip', {
+    const lambdaLayerArchive = new zip.DataArchiveFile(stack, 'lambda-layer-zip', {
         type: 'zip',
         outputPath: path.join(distDir, 'lambda-layer.zip'),
         sourceDir: path.join(distDir, 'lambda', 'layer')
     });
 
-    const layer = new aws.lambdafunction.LambdaLayerVersion(stack, 'lambda-layer', {
+    const lambdaLayer = new aws.lambdafunction.LambdaLayerVersion(stack, 'lambda-layer', {
         layerName: mainServer.name,
-        filename: archiveLambdaLayer.outputPath
+        filename: lambdaLayerArchive.outputPath
     });
 
-    const archiveLambda = new zip.DataArchiveFile(stack, 'lambda-zip', {
+    const lambdaArchive = new zip.DataArchiveFile(stack, 'lambda-zip', {
         type: 'zip',
         outputPath: path.join(distDir, 'lambda-code.zip'),
         sourceDir: path.join(distDir, 'lambda', 'function')
@@ -94,13 +94,13 @@ export const build = (stack: TerraformStack) => {
             managedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
         });
 
-        const func = new aws.lambdafunction.LambdaFunction(stack, `function-${apiNameKebab}`, {
+        const lambdaFunction = new aws.lambdafunction.LambdaFunction(stack, `function-${apiNameKebab}`, {
             layers: [
-                layer.arn
+                lambdaLayer.arn
             ],
             functionName: apiNameKebab,
             role: lambdaRole.arn,
-            filename: archiveLambda.outputPath,
+            filename: lambdaArchive.outputPath,
             runtime: 'nodejs16.x',
             handler: 'src/run-lambda.handler',
             environment: {
@@ -108,14 +108,14 @@ export const build = (stack: TerraformStack) => {
                     ANTHILL_RUNTIME: mainServer.name
                 }
             },
-            sourceCodeHash: archiveLambda.outputMd5
+            sourceCodeHash: lambdaArchive.outputMd5
         });
 
         const integration = new aws.apigatewayv2.Apigatewayv2Integration(stack, `call-${apiNameKebab}`, {
             apiId: api.id,
             integrationType: 'AWS_PROXY',
             credentialsArn: apiCallLambdaRole.arn,
-            integrationUri: func.invokeArn,
+            integrationUri: lambdaFunction.invokeArn,
             payloadFormatVersion: '2.0'
         });
 
@@ -126,7 +126,7 @@ export const build = (stack: TerraformStack) => {
             target: `integrations/${integration.id}`
         });
 
-        return { func, route, stage };
+        return { func: lambdaFunction, route, stage };
     });
 
     const funcArns = functions.map(({ func }) => func.arn);
