@@ -1,5 +1,4 @@
 import { App, TerraformStack } from 'cdktf';
-import { build as buildLocal } from './local-docker-build';
 import { build as buildAws } from './aws-build';
 
 export const build = () => {
@@ -9,11 +8,7 @@ export const build = () => {
     const app = new App();
     const stack = new DorcStack(app, 'anthill-hello-world');
 
-    if (process.env.ANTHILL_TARGET === 'aws') {
-        buildAws(stack);
-    } else {
-        buildLocal(stack);
-    }
+    buildAws(stack);
 
     console.error('Solution built. Ready to rumble.');
 

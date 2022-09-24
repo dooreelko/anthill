@@ -3,6 +3,13 @@ import fetch from 'node-fetch';
 import * as maxim from '@anthill/core';
 import { enrichPath } from './app/main';
 
+export type DockerListener = maxim.ApiServerListener & {
+    host: string;
+    port: number;
+};
+
+export type DockerApiServerProps = maxim.ApiServerProps<DockerListener>;
+
 export const methodWithBody = (method: maxim.ApiContext['method']) =>
     method !== 'GET'
     && method !== 'HEAD'
@@ -12,7 +19,7 @@ export const stringifyOnDemand = (arg: unknown) => typeof arg === 'string' ? arg
 
 export class HttpApi<TIn, TOut> extends maxim.Api<TIn, TOut> {
     exec(arg: TIn): Promise<TOut> {
-        const listener = maxim.ApiServer.getListenerByApiName(this.uid);
+        const listener = maxim.ApiServer.getListenerByApiName<DockerListener>(this.uid);
         const thisDef = listener?.apis.find(def => def.api.uid === this.uid);
 
         if (!thisDef) {

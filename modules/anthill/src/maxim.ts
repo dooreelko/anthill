@@ -103,26 +103,23 @@ export type ApiContext = {
     method: HttpMethod;
 };
 
-// TODO: this is leaky - a lot of assumptions about HTTP
 export type ApiServerListener = {
-    host: string;
-    port: number;
     apis: {
         api: Api<any, any>;
         spec: ApiContext;
     }[];
 };
 
-export type ApiServerProps = {
+export type ApiServerProps<TListener extends ApiServerListener = ApiServerListener> = {
     name: string;
-    listener: ApiServerListener;
+    listener: TListener;
 };
 
-export class ApiServer implements Archetype {
+export class ApiServer<TListener extends ApiServerListener, TServerProps extends ApiServerProps<TListener>> implements Archetype {
     static registry = new Map<string, ApiServerProps>;
     static endpointRegistry = new Map<string, string>;
 
-    static getListenerByApiName = (uid: string) => {
+    static getListenerByApiName = <TListener extends ApiServerListener>(uid: string) => {
         const entry = this.endpointRegistry.get(uid);
         if (!entry) {
             throw new Error(`No individual api registered for uid ${uid}.`);
@@ -138,10 +135,10 @@ export class ApiServer implements Archetype {
             throw new Error(`Failed finding listener for ${uid}`);
         }
 
-        return props.listener;
+        return props.listener as TListener;
     }
 
-    constructor(public props: ApiServerProps, runner?: () => void) {
+    constructor(public props: TServerProps, runner?: () => void) {
         runtimeRegistry().set(props.name, runner ?? (() => { }))
         ApiServer.registry.set(props.name, props);
         props.listener.apis
@@ -187,7 +184,3 @@ export interface IContainerRuntime<TLabels extends string> extends Archetype {
 };
 
 export const ContainerRuntime = <TLabels extends string>() => Graduate<IContainerRuntime<TLabels>>();
-
-export * from './gradual';
-export * from './runtime';
-export * from './tools';

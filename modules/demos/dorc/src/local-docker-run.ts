@@ -1,16 +1,15 @@
 import * as arch from './architecture';
 import { TerraformStack, TerraformOutput } from "cdktf";
 import { Container, DockerProvider, Image } from "@cdktf/provider-docker";
-
-import { ApiServer, ApiServerProps, ContainerStateEvent } from '@anthill/core';
-
+import { ApiServer, ContainerStateEvent } from '@anthill/core';
 import {
     apiServerBuildContext,
     DockerQueue,
     DockerKeyValueStore,
     DockerTopic,
     DockerRuntime, DummyAutoscaler,
-    run
+    run,
+    DockerApiServerProps
 } from '@anthill/local-docker';
 
 import { taskQueuePoller } from './architecture';
@@ -94,7 +93,7 @@ export const build = (stack: TerraformStack) => {
         }
     };
 
-    const mainServer: ApiServerProps = {
+    const mainServer: DockerApiServerProps = {
         name: mainApi.apiName,
         listener: {
             host: mainApi.init.host,

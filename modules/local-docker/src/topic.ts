@@ -1,5 +1,5 @@
 import * as maxim from '@anthill/core';
-import { HttpApi } from './api-server/api-server';
+import { DockerApiServerProps, HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
@@ -11,7 +11,7 @@ export class DockerTopic<T extends Object> extends maxim.Selfed<maxim.ITopic<T>>
     constructor(public readonly init: DockerServerInit) {
         super();
 
-        const server: maxim.ApiServerProps = {
+        const server: DockerApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',

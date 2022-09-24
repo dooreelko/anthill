@@ -1,7 +1,12 @@
 import * as arch from '@anthill/hello-world.architecture';
 
-import { ApiServer, ApiServerProps } from '@anthill/core';
+import { ApiServer, ApiServerProps, ApiServerListener } from '@anthill/core';
 import { run } from '@anthill/local-docker';
+
+export type DockerListener = ApiServerListener & {
+    host: string;
+    port: number;
+};
 
 export const mainApi = {
     apiName: 'hello-world',
@@ -12,7 +17,7 @@ export const mainApi = {
     }
 };
 
-export const mainServer: ApiServerProps = {
+export const mainServer: ApiServerProps<DockerListener> = {
     name: mainApi.apiName,
     listener: {
         host: mainApi.init.host,

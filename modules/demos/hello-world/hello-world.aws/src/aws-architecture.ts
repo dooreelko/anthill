@@ -1,5 +1,5 @@
 import { ApiServer, ApiServerProps } from '@anthill/core';
-import * as arch from './architecture';
+import * as arch from '@anthill/hello-world.architecture';
 
 /** CONCRETE SOLUTION IMPLEMENTATION */
 
@@ -14,8 +14,6 @@ const mainApi = {
 export const mainServer: ApiServerProps = {
     name: mainApi.apiName,
     listener: {
-        host: mainApi.init.host,
-        port: mainApi.init.port,
         apis: [
             {
                 api: arch.helloApi,

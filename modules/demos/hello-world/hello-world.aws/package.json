@@ -10,12 +10,8 @@
         "post-build": "npm run post-build:npm",
         "post-build:npm": "dep-copy . dist",
         "synth": "cdktf synth",
-        "deploy:local": "npm run clean && npm run build && npm run destroy && cdktf deploy --auto-approve && npm run deploy:smoke-test-local",
-        "deploy:smoke-test-local": "curl localhost:8080/v1/hello | jq .",
-        "deploy:aws": "npm run clean && npm run build && lambda-dist dist && ANTHILL_TARGET=aws cdktf deploy --auto-approve",
-        "destroy:aws": "ANTHILL_TARGET=aws cdktf destroy --auto-approve || true",
-        "destroy:docker": "npm run docker:clean ; cdktf destroy --auto-approve || true",
-        "docker:clean": "docker container ls --all --format '{{ json . }}' | jq -sr '.[] | select(.Image | contains(\"hello-world\")) | .ID' | xargs --no-run-if-empty docker container rm || true",
+        "deploy": "npm run clean && npm run build && lambda-dist dist && cdktf deploy --auto-approve",
+        "destroy": "cdktf destroy --auto-approve || true",
         "compile": "tsc --pretty && npm run post-build",
         "watch": "tsc --watch --pretty && npm run post-build",
         "test": "jest",
@@ -37,7 +33,6 @@
     },
     "dependencies": {
         "@anthill/core": "*",
-        "@anthill/local-docker": "*",
         "@anthill/hello-world.architecture": "*"
     },
     "devDependencies": {

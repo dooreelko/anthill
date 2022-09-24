@@ -1,7 +1,8 @@
 import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
-import { ApiServerProps } from '@anthill/core';
+import { ApiServerListener, ApiServerProps } from '@anthill/core';
+import { DockerListener } from '../api-server';
 
 export const apiInventory = {};
 
@@ -71,7 +72,7 @@ const matchPath = (path: string, pathSpec: string) => {
         }), {});
 }
 
-export const run = (server: ApiServerProps) => {
+export const run = (server: ApiServerProps<DockerListener>) => {
     const app = new Koa();
 
     app.use(koaBody({

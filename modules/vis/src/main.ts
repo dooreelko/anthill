@@ -1,31 +1,50 @@
 #!/usr/bin/env node
 
+import { existsSync } from 'fs';
 import { NewExpression, Project, SyntaxKind, ts } from 'ts-morph';
 import * as rx from 'rxjs';
 import { graphviz } from '@hpcc-js/wasm';
 import roughUp from 'rougher';
 import { collectChildren, first, getParentTypes, getParentVarDeclaration, getRootCallDeclaration, getRootVarDeclaration, nodeTypeName } from './gnomes';
 
-if (process.argv.length < 3) {
+const usage = () => {
     console.error(`@anthill/vis. Generate solution diagrams from code.
-
-Usage
+    
+    Usage
     ./node_modules/.bin/vis tsconfig.json [include-only-these-files] 
-`);
+    `);
 
     process.exit(1);
+};
+
+if (process.argv.length < 3) {
+    usage();
+}
+
+const tsConfigPath = process.argv[2];
+
+if (!existsSync(tsConfigPath)) {
+    console.error(`Cannot find tsc config at ${tsConfigPath}`);
+    usage();
 }
 
 const fileFilters = new Set(process.argv.slice(3));
 
-const project = new Project();
-project.addSourceFilesFromTsConfig(process.argv[2]);
+const project = new Project({
+    tsConfigFilePath: tsConfigPath
+});
 
 const checker = project.getTypeChecker();
 
 const news = project.getSourceFiles()
-    .filter(f => fileFilters.size ? fileFilters.has(f.getBaseName()) : true)
+    .filter(f => {
+        const keep = fileFilters.size ? fileFilters.has(f.getBaseName()) : true;
+
+        // console.error(`${keep ? 'keeping' : 'skipping'} ${f.getFilePath()}`);
+        return keep;
+    })
     .flatMap(f => collectChildren(f))
+    // TODO: also collect `export declare const` vars from parent projects
     .filter(n => n.isKind(ts.SyntaxKind.NewExpression))
     .filter(n => {
         const parentTypes = getParentTypes(n.compilerNode, checker);

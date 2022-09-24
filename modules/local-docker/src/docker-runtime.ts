@@ -2,7 +2,7 @@ import Docker = require('dockerode');
 import JSONStream = require('pixl-json-stream');
 import { EventEmitter } from 'stream';
 import * as maxim from '@anthill/core';
-import { HttpApi } from './api-server/api-server';
+import { DockerApiServerProps, HttpApi } from './api-server/api-server';
 import { run } from './api-server/app/main';
 import { DockerServerInit } from './tools';
 
@@ -45,7 +45,7 @@ export class DockerRuntime<TLabels extends string> extends maxim.Selfed<maxim.IC
     constructor(public readonly init: DockerServerInit) {
         super();
 
-        const server: maxim.ApiServerProps = {
+        const server: DockerApiServerProps = {
             name: this.apiName,
             listener: {
                 host: 'localhost',
