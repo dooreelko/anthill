@@ -1,7 +1,7 @@
 {
-    "name": "@anthill/hello-world",
+    "name": "@anthill/hello-world.aws",
     "version": "1.0.0",
-    "description": "Minimal app using @anthill",
+    "description": "Minimal app using @anthill, aws run",
     "main": "dist/src/main.js",
     "scripts": {
         "get": "cdktf get",
@@ -37,7 +37,8 @@
     },
     "dependencies": {
         "@anthill/core": "*",
-        "@anthill/local-docker": "*"
+        "@anthill/local-docker": "*",
+        "@anthill/hello-world.architecture": "*"
     },
     "devDependencies": {
         "@anthill/vis": "*",

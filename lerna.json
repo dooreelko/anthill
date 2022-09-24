@@ -5,8 +5,6 @@
     "version": "1.0.0",
     "packages": [
         ".",
-        "modules/*",
-        "modules/tools/*",
-        "modules/demos/*"
+        "modules/**/*"
     ]
 }

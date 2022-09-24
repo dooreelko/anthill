@@ -21,7 +21,13 @@
             "path": "./modules/demos/dorc/tsconfig.json"
         },
         {
-            "path": "./modules/demos/hello-world/tsconfig.json"
+            "path": "./modules/demos/hello-world/hello-world.architecture/tsconfig.json"
+        },
+        {
+            "path": "./modules/demos/hello-world/hello-world.local-docker/tsconfig.json"
+        },
+        {
+            "path": "./modules/demos/hello-world/hello-world.aws/tsconfig.json"
         }
     ]
 }

@@ -1,0 +1,21 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "composite": true
+    },
+    "references": [
+        {
+            "path": "../../../anthill/tsconfig.json"
+        },
+        {
+            "path": "../../../vis/tsconfig.json"
+        },
+        {
+            "path": "../hello-world.architecture/tsconfig.json"
+        }
+    ],
+    "include": [
+        "**/*.ts"
+    ]
+}

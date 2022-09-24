@@ -1,15 +1,15 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "outDir": "dist",
         "composite": true
     },
     "references": [
         {
-            "path": "../../anthill/tsconfig.json"
+            "path": "../../../anthill/tsconfig.json"
         },
         {
-            "path": "../../vis/tsconfig.json"
+            "path": "../../../vis/tsconfig.json"
         }
     ],
     "include": [

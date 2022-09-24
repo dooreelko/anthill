@@ -1,4 +1,4 @@
-import * as arch from './architecture';
+import * as arch from '@anthill/hello-world.architecture';
 
 import { ApiServer, ApiServerProps } from '@anthill/core';
 import { run } from '@anthill/local-docker';

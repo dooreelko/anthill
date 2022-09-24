@@ -1,0 +1,43 @@
+{
+    "name": "@anthill/hello-world.architecture",
+    "version": "1.0.0",
+    "description": "Minimal app using @anthill. Architecture",
+    "main": "dist/src/main.js",
+    "scripts": {
+        "get": "cdktf get",
+        "build": "tsc",
+        "clean": "rm -rf dist",
+        "compile": "tsc --pretty && npm run post-build",
+        "watch": "tsc --watch --pretty && npm run post-build",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "vis": "vis tsconfig.json > hello.svg",
+        "lint": "eslint $npm_config_local_prefix"
+    },
+    "keywords": [
+        "docker",
+        "cloud"
+    ],
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "engines": {
+        "node": ">=14.0"
+    },
+    "dependencies": {
+        "@anthill/core": "*",
+        "@anthill/local-docker": "*"
+    },
+    "devDependencies": {
+        "@anthill/vis": "*",
+        "@anthill/dep-copy": "*",
+        "@anthill/lambda-dist": "*",
+        "@cdktf/provider-docker": "^2.0.0",
+        "@cdktf/provider-null": "^2.0.0",
+        "@cdktf/provider-aws": "^9.0.15",
+        "@cdktf/provider-archive": "^2.0.0",
+        "@cdktf/provider-local": "^2.0.0",
+        "cdktf": "^0.12.0",
+        "constructs": "^10.1.48",
+        "@anthill/eslint-config": "*"
+    }
+}

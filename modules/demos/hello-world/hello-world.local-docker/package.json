@@ -1,0 +1,53 @@
+{
+    "name": "@anthill/hello-world.local-docker",
+    "version": "1.0.0",
+    "description": "Minimal app using @anthill, local docker run",
+    "main": "dist/src/main.js",
+    "scripts": {
+        "get": "cdktf get",
+        "build": "tsc && npm run post-build",
+        "clean": "rm -rf dist",
+        "post-build": "npm run post-build:npm",
+        "post-build:npm": "dep-copy . dist",
+        "synth": "cdktf synth",
+        "deploy": "npm run clean && npm run build && npm run destroy && cdktf deploy --auto-approve && npm run deploy:smoke-test",
+        "deploy:smoke-test": "curl localhost:8080/v1/hello | jq .",
+        "destroy": "npm run docker:clean ; cdktf destroy --auto-approve || true",
+        "docker:clean": "docker container ls --all --format '{{ json . }}' | jq -sr '.[] | select(.Image | contains(\"hello-world\")) | .ID' | xargs --no-run-if-empty docker container rm || true",
+        "compile": "tsc --pretty && npm run post-build",
+        "watch": "tsc --watch --pretty && npm run post-build",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "upgrade": "npm i cdktf@latest cdktf-cli@latest",
+        "upgrade:next": "npm i cdktf@next cdktf-cli@next",
+        "vis": "vis tsconfig.json > hello.svg",
+        "lint": "eslint $npm_config_local_prefix"
+    },
+    "keywords": [
+        "docker",
+        "cloud"
+    ],
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "engines": {
+        "node": ">=14.0"
+    },
+    "dependencies": {
+        "@anthill/core": "*",
+        "@anthill/local-docker": "*",
+        "@anthill/hello-world.architecture": "*"
+    },
+    "devDependencies": {
+        "@anthill/vis": "*",
+        "@anthill/dep-copy": "*",
+        "@anthill/lambda-dist": "*",
+        "@cdktf/provider-docker": "^2.0.0",
+        "@cdktf/provider-null": "^2.0.0",
+        "@cdktf/provider-aws": "^9.0.15",
+        "@cdktf/provider-archive": "^2.0.0",
+        "@cdktf/provider-local": "^2.0.0",
+        "cdktf": "^0.12.0",
+        "constructs": "^10.1.48",
+        "@anthill/eslint-config": "*"
+    }
+}
