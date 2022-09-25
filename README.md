@@ -28,7 +28,7 @@ By separating architecture and design, we allow for a clear-cut segregation betw
 
 Common sense so far.
 
-### Decide only when it's necessary
+### Avoid or at least postpone lock-in decisions
 
 Still, this liberates us from the need of making early costly decisions; decisions that could be done later in the project's lifecycle.
 

@@ -1,6 +1,7 @@
 {
     "name": "@anthill/hello-world.architecture",
     "version": "1.0.0",
+    "private": "true",
     "description": "Minimal app using @anthill. Architecture",
     "main": "dist/src/main.js",
     "scripts": {

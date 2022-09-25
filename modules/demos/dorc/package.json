@@ -1,6 +1,7 @@
 {
     "name": "@anthill/actually-cloud-native-dorc",
     "version": "1.0.0",
+    "private": "true",
     "description": "Actually cloud-native container orchestrator",
     "main": "dist/src/main.js",
     "scripts": {

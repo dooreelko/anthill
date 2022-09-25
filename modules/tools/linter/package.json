@@ -1,7 +1,8 @@
 {
     "name": "@anthill/eslint-config",
     "version": "1.0.0",
-    "description": "",
+    "private": true,
+    "description": "Anthill's shared eslint rules",
     "main": "eslintrc.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

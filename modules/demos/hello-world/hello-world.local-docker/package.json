@@ -1,6 +1,7 @@
 {
     "name": "@anthill/hello-world.local-docker",
     "version": "1.0.0",
+    "private": "true",
     "description": "Minimal app using @anthill, local docker run",
     "main": "dist/src/main.js",
     "scripts": {

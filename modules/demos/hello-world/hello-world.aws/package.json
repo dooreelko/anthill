@@ -1,6 +1,7 @@
 {
     "name": "@anthill/hello-world.aws",
     "version": "1.0.0",
+    "private": "true",
     "description": "Minimal app using @anthill, aws run",
     "main": "dist/src/main.js",
     "scripts": {

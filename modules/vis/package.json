@@ -14,6 +14,10 @@
         "lint": "eslint $npm_config_local_prefix",
         "test:watch": "jest --watch"
     },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
     "dependencies": {
         "@anthill/core": "*",
         "@hpcc-js/wasm": "^1.15.0",
