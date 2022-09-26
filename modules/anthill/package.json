@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/core",
+    "name": "@arinoto/core",
     "version": "1.0.0",
     "description": "Architecture as code with pluggable design, main library",
     "main": "dist/src/main.js",

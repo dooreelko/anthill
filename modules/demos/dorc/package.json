@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/actually-cloud-native-dorc",
+    "name": "@arinoto/actually-cloud-native-dorc",
     "version": "1.0.0",
     "private": "true",
     "description": "Actually cloud-native container orchestrator",
@@ -29,14 +29,14 @@
         "node": ">=14.0"
     },
     "dependencies": {
-        "@anthill/core": "*",
-        "@anthill/local-docker": "*",
+        "@arinoto/core": "*",
+        "@arinoto/local-docker": "*",
         "@cdktf/provider-docker": "^0.8.36",
         "@cdktf/provider-null": "^0.7.35",
         "cdktf": "^0.11.2",
         "constructs": "^10.1.48"
     },
     "devDependencies": {
-        "@anthill/vis": "*"
+        "@arinoto/vis": "*"
     }
 }

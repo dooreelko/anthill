@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/dep-copy",
+    "name": "@arinoto/dep-copy",
     "version": "1.0.0",
     "description": "@anthill's runteme dependency copier",
     "main": "dist/src/main.js",
@@ -22,7 +22,7 @@
         "cpy": "^9.0.1"
     },
     "devDependencies": {
-        "@anthill/eslint-config": "*"
+        "@arinoto/eslint-config": "*"
     },
     "repository": {
         "type": "git",

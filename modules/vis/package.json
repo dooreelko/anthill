@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/vis",
+    "name": "@arinoto/vis",
     "version": "1.0.0",
     "description": "@anthill's architecture visualiser",
     "main": "dist/src/main.js",
@@ -19,7 +19,7 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@anthill/core": "*",
+        "@arinoto/core": "*",
         "@hpcc-js/wasm": "^1.15.0",
         "rougher": "^1.1.2",
         "roughjs": "^4.5.2",
@@ -29,7 +29,7 @@
         "viz.js": "^2.1.2"
     },
     "devDependencies": {
-        "@anthill/eslint-config": "*"
+        "@arinoto/eslint-config": "*"
     },
     "repository": {
         "type": "git",

@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.579489"
-     inkscape:cx="1665.0955"
-     inkscape:cy="3485.9375"
+     inkscape:zoom="0.55843369"
+     inkscape:cx="1665.3723"
+     inkscape:cy="2863.3659"
      inkscape:window-width="3000"
      inkscape:window-height="1946"
      inkscape:window-x="0"
@@ -487,7 +487,7 @@
        sodipodi:nodetypes="cccccccccccccccccccccc" />
     <g
        id="g35627"
-       transform="translate(-11.702136)">
+       transform="translate(-21.975405)">
       <g
          id="g12860"
          transform="matrix(0.36249482,0,0,0.35835786,244.39321,691.46318)"
@@ -515,7 +515,7 @@
            id="tspan14402"
            style="font-style:normal;font-variant:normal;font-weight:200;font-stretch:normal;font-size:42.3333px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
            x="414.00159"
-           y="951.25757">Anthill</tspan></text>
+           y="951.25757">Arinoto</tspan></text>
     </g>
     <text
        xml:space="preserve"
@@ -526,8 +526,8 @@
        y="0"><tspan
          x="1331.8467"
          y="3723.7246"
-         id="tspan47337"><tspan
+         id="tspan2390"><tspan
            style="font-weight:200;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';text-align:center;text-anchor:middle"
-           id="tspan47335">Agnostic cloud-native engineering methodology</tspan></tspan></text>
+           id="tspan2388">Agnostic cloud-native engineering methodology</tspan></tspan></text>
   </g>
 </svg>

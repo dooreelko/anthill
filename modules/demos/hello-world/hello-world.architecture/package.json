@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/hello-world.architecture",
+    "name": "@arinoto/hello-world.architecture",
     "version": "1.0.0",
     "private": "true",
     "description": "Minimal app using @anthill. Architecture",
@@ -25,10 +25,10 @@
         "node": ">=14.0"
     },
     "dependencies": {
-        "@anthill/core": "*"
+        "@arinoto/core": "*"
     },
     "devDependencies": {
-        "@anthill/vis": "*",
-        "@anthill/eslint-config": "*"
+        "@arinoto/vis": "*",
+        "@arinoto/eslint-config": "*"
     }
 }

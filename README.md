@@ -1,4 +1,4 @@
-# Anthill
+# Arinoto / Anthill
 
 Anthill is a software engineering methodology, allowing for a runtime-agnostic, pluggable, iterative and refactorable Everything-As-A-Code solution architecture, design, infrastructure 
 and ... well, code.

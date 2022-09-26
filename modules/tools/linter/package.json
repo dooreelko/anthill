@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/eslint-config",
+    "name": "@arinoto/eslint-config",
     "version": "1.0.0",
     "private": true,
     "description": "Anthill's shared eslint rules",

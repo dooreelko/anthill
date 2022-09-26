@@ -1,5 +1,5 @@
 {
-    "name": "@anthill/local-docker",
+    "name": "@arinoto/local-docker",
     "version": "1.0.0",
     "description": "@anthill's naive primitives running as docker containers",
     "main": "dist/src/main.js",
@@ -18,7 +18,7 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@anthill/core": "*",
+        "@arinoto/core": "*",
         "dockerode": "^3.3.2",
         "koa": "^2.13.4",
         "koa-body": "^5.0.0",
