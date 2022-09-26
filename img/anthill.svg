@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.55843369"
-     inkscape:cx="1665.3723"
-     inkscape:cy="2863.3659"
+     inkscape:zoom="0.57678842"
+     inkscape:cx="-492.38159"
+     inkscape:cy="3472.6772"
      inkscape:window-width="3000"
      inkscape:window-height="1946"
      inkscape:window-x="0"
@@ -35,7 +35,7 @@
      showguides="true"
      inkscape:guide-bbox="true">
     <sodipodi:guide
-       position="383.53273,-430.77105"
+       position="150.40062,-429.62186"
        orientation="0,-1"
        id="guide11653" />
     <sodipodi:guide
@@ -58,6 +58,10 @@
        position="468.531,-654.46808"
        orientation="0,-1"
        id="guide35620" />
+    <sodipodi:guide
+       position="-19.398036,-361.47758"
+       orientation="0,-1"
+       id="guide4128" />
   </sodipodi:namedview>
   <defs
      id="defs2">
@@ -67,6 +71,18 @@
        width="1150.0115"
        height="123.99091"
        id="rect9534" />
+    <rect
+       x="1234.5559"
+       y="3688.3335"
+       width="1150.0115"
+       height="123.99091"
+       id="rect3474" />
+    <rect
+       x="1234.5559"
+       y="3688.3335"
+       width="1150.0115"
+       height="123.99091"
+       id="rect4569" />
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -465,21 +481,16 @@
        inkscape:export-filename="/home/doo/projects/dorc/img/anthill.png"
        inkscape:export-xdpi="179.39"
        inkscape:export-ydpi="179.39" />
-    <g
-       id="g12854">
-      <path
-         id="path12415"
-         style="color:#000000;fill:#000000;stroke:#ffffff;stroke-width:18.8976;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 1159.6797,2276.7988 c -35.8367,152.8726 -79.7267,311.7324 -115.5527,464.6074 l 40.791,0.629 c 16.9551,-72.2735 34.9252,-141.0565 52.8847,-213.836 l 196.3399,-1.6269 c 0.031,73.7264 0.061,143.454 0.09,215.6543 l 37.7949,-0.016 c -0.03,-72.3119 -0.06,-142.0335 -0.09,-215.7441 h 189.0078 v 194.8594 18.8984 h 37.7949 v -18.8984 -232.6543 h -226.8183 c -0.029,-71.063 -0.057,-142.1513 -0.086,-211.8731 z m 29.957,37.795 h 144.418 c 0.023,57.2534 0.048,115.7626 0.072,174.1816 l -186.9883,1.5488 c 14.4673,-58.7276 28.8173,-117.3966 42.498,-175.7304 z"
-         transform="scale(0.26458333)"
-         sodipodi:nodetypes="cccccccccccccccccccccc" />
-      <path
-         id="path9781"
-         style="color:#000000;fill:#000000;stroke:none;stroke-width:8.31496;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 1159.6797,2276.7988 c -35.8367,152.8726 -79.7267,313.7324 -115.5527,466.6074 l 40.791,0.629 c 16.9551,-72.2735 34.9252,-143.0565 52.8847,-215.836 l 196.3399,-1.6269 c 0.031,73.7264 0.061,145.454 0.09,217.6543 l 37.7949,-0.016 c -0.03,-72.3119 -0.06,-144.0335 -0.09,-217.7441 h 189.0078 v 194.8594 18.8984 h 37.7949 v -18.8984 -232.6543 h -226.8183 c -0.029,-71.063 -0.057,-142.1513 -0.086,-211.8731 z m 29.957,37.795 h 144.418 c 0.023,57.2534 0.048,115.7626 0.072,174.1816 l -186.9883,1.5488 c 14.4673,-58.7276 28.8173,-117.3966 42.498,-175.7304 z"
-         transform="scale(0.26458333)"
-         sodipodi:nodetypes="cccccccccccccccccccccc" />
-    </g>
+    <path
+       id="path12415"
+       style="color:#000000;fill:#000000;stroke:#ffffff;stroke-width:4.99999;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 306.83192,602.40301 c -9.4818,40.44754 -21.09436,82.47919 -30.57332,122.92737 l 10.79262,0.16642 c 4.48603,-19.12236 9.24062,-37.32119 13.99241,-56.57744 l 51.94826,-0.43045 c 0.008,19.50678 0.0161,37.95554 0.0238,57.05854 l 9.9999,-0.004 c -0.008,-19.13252 -0.0159,-37.57969 -0.0238,-57.08229 h 50.00832 v 51.55655 5.0002 h 9.9999 v -5.0002 -61.55645 h -60.01235 c -0.008,-18.80209 -0.0151,-37.61087 -0.0228,-56.05809 z m 7.92612,9.99993 h 38.21059 c 0.006,15.14829 0.0127,30.62885 0.019,46.08554 l -49.47398,0.40979 c 3.8278,-15.53834 7.62458,-31.06118 11.24426,-46.49533 z"
+       sodipodi:nodetypes="cccccccccccccccccccccc" />
+    <path
+       id="path9781"
+       style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 306.83192,602.40301 c -9.4818,40.44754 -21.09436,83.00836 -30.57332,123.45654 l 10.79262,0.16642 c 4.48603,-19.12236 9.24062,-37.85036 13.99241,-57.10661 l 51.94826,-0.43045 c 0.008,19.50678 0.0161,38.48471 0.0238,57.5877 l 9.9999,-0.004 c -0.008,-19.13252 -0.0159,-38.10886 -0.0238,-57.61146 h 50.00832 c 0,18.85225 0,37.7045 0,56.55675 h 9.9999 c 0,-22.18555 0,-44.3711 0,-66.55665 h -60.01235 c -0.008,-18.80209 -0.0151,-37.61087 -0.0228,-56.05809 z m 7.92612,9.99993 h 38.21059 c 0.006,15.14829 0.0127,30.62885 0.019,46.08554 l -49.47398,0.40979 c 3.8278,-15.53834 7.62458,-31.06118 11.24426,-46.49533 z"
+       sodipodi:nodetypes="ccccccccccccccccccccc" />
     <path
        id="path12733"
        style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -526,8 +537,107 @@
        y="0"><tspan
          x="1331.8467"
          y="3723.7246"
-         id="tspan2390"><tspan
+         id="tspan4762"><tspan
            style="font-weight:200;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';text-align:center;text-anchor:middle"
-           id="tspan2388">Agnostic cloud-native engineering methodology</tspan></tspan></text>
+           id="tspan4760">Agnostic cloud-native engineering methodology</tspan></tspan></text>
+    <path
+       id="path3170"
+       style="color:#000000;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:5;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 110.44241,610.69587 C 99.056893,627.23548 88.586532,685.37106 80.466822,725.85955 l 10.792614,0.16642 c 4.486027,-19.12236 9.240614,-37.85036 13.992404,-57.10661 l 51.94826,-0.43045 c 0.008,19.50678 0.0161,38.48471 0.0238,57.5877 l 9.9999,-0.004 c -0.008,-19.13252 -0.0159,-38.10886 -0.0238,-57.61146 0,0 21.79714,-9.35027 34.13332,0 12.33618,9.35027 15.875,57.61508 15.875,57.61508 h 9.9999 c 0,0 -1.15089,-55.9898 -15.875,-67.61498 -14.72411,-11.62518 -44.13735,0 -44.13735,0 -0.008,-18.80209 -0.0151,-37.61087 -0.0228,-56.05809 0,0 -45.34513,-8.24691 -56.73066,8.29271 z m 46.73443,1.70707 c 0.006,15.14829 0.0127,30.62885 0.019,46.08554 l -49.47398,0.40979 c 3.8278,-15.53834 7.28702,-31.92125 15.44651,-39.71981 8.15948,-7.79856 34.00847,-6.77552 34.00847,-6.77552 z"
+       sodipodi:nodetypes="zccccccczcczcczccczc" />
+    <path
+       id="path2569"
+       style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 110.44241,610.69587 C 99.056893,627.23548 88.586532,685.37106 80.466822,725.85955 l 10.792614,0.16642 c 4.486027,-19.12236 9.240614,-37.85036 13.992404,-57.10661 l 51.94826,-0.43045 c 0.008,19.50678 0.0161,38.48471 0.0238,57.5877 l 9.9999,-0.004 c -0.008,-19.13252 -0.0159,-38.10886 -0.0238,-57.61146 0,0 21.79714,-9.35027 34.13332,0 12.33618,9.35027 15.875,57.61508 15.875,57.61508 h 9.9999 c 0,0 -1.15089,-55.9898 -15.875,-67.61498 -14.72411,-11.62518 -44.13735,0 -44.13735,0 -0.008,-18.80209 -0.0151,-37.61087 -0.0228,-56.05809 0,0 -45.34513,-8.24691 -56.73066,8.29271 z m 46.73443,1.70707 c 0.006,15.14829 0.0127,30.62885 0.019,46.08554 l -49.47398,0.40979 c 3.8278,-15.53834 7.28702,-31.92125 15.44651,-39.71981 8.15948,-7.79856 34.00847,-6.77552 34.00847,-6.77552 z"
+       sodipodi:nodetypes="zccccccczcczcczccczc" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4.99999;stroke-linejoin:bevel"
+       id="rect3454"
+       width="338.66666"
+       height="169.33333"
+       x="-103.75267"
+       y="876.50275"
+       inkscape:export-filename="/home/doo/projects/dorc/img/anthill-gh-social.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-413.07267,-9.8738203)"
+       id="text3472"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect3474);fill:#000000;fill-opacity:1;stroke:none"
+       x="479.73633"
+       y="0"><tspan
+         x="1331.8467"
+         y="3723.7246"
+         id="tspan4766"><tspan
+           style="font-weight:200;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';text-align:center;text-anchor:middle"
+           id="tspan4764">Agnostic cloud-native engineering methodology</tspan></tspan></text>
+    <g
+       id="g4656"
+       transform="translate(1.1996758)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="26.900997"
+         y="951.25757"
+         id="text3464"><tspan
+           sodipodi:role="line"
+           id="tspan3462"
+           style="font-style:normal;font-variant:normal;font-weight:200;font-stretch:normal;font-size:42.3333px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="26.900997"
+           y="951.25757">Arinoto</tspan></text>
+      <path
+         id="path3563"
+         style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m -36.022426,909.39753 c -4.194833,6.03095 -9.110823,27.22929 -12.102416,41.99286 l 3.976386,0.0607 c 1.652814,-6.9727 3.404574,-13.80161 5.155304,-20.82314 l 19.139606,-0.15696 c 0.003,7.11288 0.0059,14.03292 0.0088,20.99857 l 3.684322,-10e-4 c -0.003,-6.97641 -0.0059,-13.89587 -0.0088,-21.00723 0,0 8.0308492,-3.40945 12.5759409,0 4.54509173,3.40945 5.8489197,21.00855 5.8489197,21.00855 h 3.6843217 c 0,0 -0.424029,-20.41591 -5.84891967,-24.65488 -5.42489063,-4.23896 -16.26178463,0 -16.26178463,0 -0.0029,-6.85592 -0.0056,-13.71428 -0.0084,-20.44081 0,0 -15.648442,-3.00712 -19.84328,3.02382 z m 16.16031,0.62246 c 0.0022,5.52362 0.0047,11.16839 0.007,16.80446 l -18.227991,0.14943 c 1.410298,-5.66584 3.213966,-11.63965 6.220215,-14.48329 3.006246,-2.84363 12.000775,-2.4706 12.000776,-2.4706 z"
+         sodipodi:nodetypes="cccccccczcczcczccczcc" />
+    </g>
+    <path
+       id="path4312"
+       style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -95.932604,610.69587 c -11.385516,16.53961 -21.855886,74.67519 -29.975596,115.16368 l 10.79262,0.16642 c 4.48603,-19.12236 3.94895,-19.32953 8.70074,-38.58578 l 57.239899,-16.30545 c 0.008,19.50678 0.0161,35.83888 0.0238,54.94187 l 9.999894,-0.004 c -0.008,-19.13252 -0.0159,-38.10886 -0.0238,-57.61146 0,0 21.797128,-9.35027 34.133298,0 12.3361733,9.35027 15.87499,57.61508 15.87499,57.61508 h 9.999894 c 0,0 -1.150887,-55.9898 -15.8749907,-67.61498 -14.7241,-11.62518 -44.1373213,0 -44.1373213,0 -0.008,-18.80209 -0.0151,-37.61087 -0.0228,-56.05809 0,0 -45.345107,-8.24691 -56.730627,8.29271 z m 46.734403,1.70707 c 0.006,15.14829 0.0127,33.27468 0.019,48.73137 l -54.765619,16.28479 c 3.8278,-15.53834 12.578683,-50.44208 20.738167,-58.24064 8.159477,-7.79856 34.008452,-6.77552 34.008452,-6.77552 z"
+       sodipodi:nodetypes="zccccccczcczcczccczc" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4.99999;stroke-linejoin:bevel"
+       id="rect4555"
+       width="338.66666"
+       height="169.33333"
+       x="-474.16904"
+       y="876.50275"
+       inkscape:export-filename="/home/doo/projects/dorc/img/anthill-gh-social.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-783.48957,-9.8738203)"
+       id="text4565"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect4569);fill:#000000;fill-opacity:1;stroke:none"
+       x="479.73633"
+       y="0"><tspan
+         x="1331.8467"
+         y="3723.7246"
+         id="tspan4770"><tspan
+           style="font-weight:200;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';text-align:center;text-anchor:middle"
+           id="tspan4768">Agnostic cloud-native engineering methodology</tspan></tspan></text>
+    <g
+       id="g4661"
+       transform="translate(2.2348059)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="-343.51562"
+         y="951.25757"
+         id="text4559"><tspan
+           sodipodi:role="line"
+           id="tspan4557"
+           style="font-style:normal;font-variant:normal;font-weight:200;font-stretch:normal;font-size:42.3333px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans, Ultra-Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+           x="-343.51562"
+           y="951.25757">Arinoto</tspan></text>
+      <path
+         id="path4651"
+         style="color:#000000;fill:#000000;stroke:none;stroke-width:2.2;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m -409.57872,908.99687 c -4.19083,6.08798 -8.04481,27.48679 -11.03356,42.38996 l 3.9726,0.0613 c 1.65124,-7.03866 1.45355,-7.11492 3.20261,-14.20285 l 21.06913,-6.00178 c 0.003,7.18014 0.006,13.19174 0.009,20.22325 h 3.68081 c -0.003,-7.04238 -0.006,-14.02728 -0.009,-21.20589 0,0 8.02319,-3.44169 12.56394,0 4.54076,3.44169 5.84334,21.20722 5.84334,21.20722 h 3.68081 c 0,0 -0.42362,-20.60898 -5.84333,-24.88803 -5.41972,-4.27905 -16.24628,0 -16.24628,0 -0.003,-6.92076 -0.006,-13.84398 -0.008,-20.63412 0,0 -16.69083,-3.03556 -20.88166,3.05242 z m 17.20221,0.62835 c 0.002,5.57585 0.005,12.24789 0.007,17.93727 l -20.15838,5.99418 c 1.40895,-5.71943 4.63001,-18.56695 7.6334,-21.43748 3.00337,-2.87054 12.51798,-2.49397 12.51798,-2.49397 z"
+         sodipodi:nodetypes="zccccccczcczcczccczc" />
+    </g>
   </g>
 </svg>

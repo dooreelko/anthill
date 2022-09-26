@@ -8,7 +8,7 @@ There's also a tiny library of primitives and runtime helpers.
 > If all you need is a quick start, jump straight to the [Hello world](#hello-world).
 
 
-Now that you're here, let's define some axioms.
+Now since you're still here, let's define some axioms.
 
 ### Solution Architecture
 High level description of components of the solution.
@@ -28,9 +28,9 @@ By separating architecture and design, we allow for a clear-cut segregation betw
 
 Common sense so far.
 
-### Avoid or at least postpone lock-in decisions
+The advantage of this approach, though, is that same business logic can be ran on different targets - it becomes unaware of where it's executed and this permits us to: 
 
-Still, this liberates us from the need of making early costly decisions; decisions that could be done later in the project's lifecycle.
+### Avoid or at least postpone costly lock-in decisions
 
 From an architect's point of view it doesn't matter whether an API is served from an AKS, AWS API Gateway or a Raspberry Pi plugged next to my TV.
 
@@ -50,7 +50,7 @@ The no-abstraction camp simply makes an early decision on the target stack and w
 
 This approach has the advantage of maximally utilising the target platform.
 
-The main drawback is that a solution, designed, for instance, with AWS services in mind, is not immediately convertible to Azure. And it costs to develop same thing several times.
+The main drawback is that a solution, designed, for instance, with AWS services in mind, is not immediately convertible to Azure. And making the code portable afterwards is not easy.
 
 Effectively, this is the sweet vendor lock-in. Sweet, for the vendor.
 
@@ -59,12 +59,12 @@ Effectively, this is the sweet vendor lock-in. Sweet, for the vendor.
 The examples here are Kubernetes, React Native, Electron, etc.
 This is the opposite side of the spectrum, where the abstraction layer attempts to eliminate the platform differences.
 
-The vendor lock-in is solved, but one loses the advantages of vendor-specific services. 
+The vendor lock-in is solved, but one loses the advantages of vendor-specific services or creates a hodgepodge of abstract code, peppered with conditional compilation to accommodate target platform's specifics. 
 
 #### Anthill
 
 Anthill, on the other hand, takes a middle approach between the two camps. 
-> Only parts, relevant to the solution's architecture are minimally abstracted. 
+> Only parts, relevant to the solution's architecture, are minimally abstracted. 
 
 And it becomes possible thanks to the separation of architecture and design.
 In addition, since the abstractions are minimal, it's possible to fine tune them for a specific solution. One doesn't need a universal set of abstractions, that are correct for all cases.
@@ -135,6 +135,31 @@ And here's an example of a slightly more elaborate architecture running locally 
 ![API diagram](./modules/demos/dorc/dorc.svg)
 
 Because we can.
+
+### Business logic is separate from the infrastructure.
+
+If we were to have our API function to lookup something from, say, a key-value store, the code would look something like this:
+
+```typescript
+
+// this creates a strongly typed class definition for the key-value store
+const HelloKeyValueStore = KeyValueStore<string, string>();
+
+// this creates an instance of the key-value store
+const helloStore = new HelloKeyValueStore();
+
+export const helloFunc = new Func<HelloInput, HelloOutput>({
+    code: async () => {
+        
+        // `get` is an API of the k-v store
+        const value = await helloStore.get.exec('world');
+
+        return { message: `hello ${value}` }
+    }
+});
+```
+
+> Still, no assumptions of what kind of key-value store - we're still free to plug one we need. 
 
 Now, I mentioned docker implementation. Let's get back to the `hello world`.
 
@@ -335,3 +360,23 @@ And just like with docker execution, we have a single entry point under [run-lam
 The last part is a TODO - we need to generate JSON Schema documents from payload definitions and integrate validation into API execution.
 
 Same for the OpenApi documentation. We don't need to maintain those by hand - we can derive them from our code.
+
+## Q&A
+Q. How is anthill different from AWS CDK, Pulumi?
+    
+    A: You can (and probably should) use any of those to deliver actual infrastructure (the examples here use CDKTF). 
+
+Q. How is it different from dapr.io?
+
+    > Note. I've only superficial knowledge of Dapr.
+    A: First, Dapr uses YAML to late-bind code and infrastructure. Yuck.
+    Second, Dapr, offers a universal runtime that attempts to abstract away the target platform, thus making it closer to the full-abstraction camp. 
+    Third, if you look at the hello world* Dapr, they create an express server first - that's a very strong assumption, compared to the anthill.
+
+    * https://github.com/dapr/quickstarts/tree/master/tutorials/hello-world
+
+
+## TODO
+
+- Validation that all architecture components have received full implementation.
+- Docs on how anthill doesn't use OO but Entity objects to have partially implemented non-abstract classes.
