@@ -376,6 +376,20 @@ Q. How is it different from dapr.io?
     * https://github.com/dapr/quickstarts/tree/master/tutorials/hello-world
 
 
+Q. What if I want to use AWS Athena?
+
+    A: Think of this as those questions in certifications exams. Sounds like you have a requirement to get tabular responses using SQL. And you don't mind the response to be non-immediate (you'll have to poll using the query's id) and results coming paged.
+
+    This is how you'll describe your architecture and then you'll be able to plug AWS Athena, SQLite, Azure Synapse Analytics or anything else that can eventually (yes, you'll have to emulate non-immediate response if your engine responds immediately) respond with a tabular data to a SQL query.
+
+    Yes, it would be moderately faster to use Athena directly, but are you 100% sure it's the right choice at this stage? If you get delayed by several days today, is it worse than realising Athena was not a good match after all a several months in and trying to switch to something else?
+
+    Even if it's the right choice today, it's not guaranteed to stay so in a year. Cloud solutions are supposed to evolve over time:
+
+https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-opti.html
+
+https://learn.microsoft.com/en-us/azure/architecture/framework/cost/optimize-checklist
+
 ## TODO
 
 - Validation that all architecture components have received full implementation.
