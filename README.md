@@ -7,8 +7,34 @@ There's also a tiny library of primitives and runtime helpers.
 
 > If all you need is a quick start, jump straight to the [Hello world](#hello-world).
 
+<!-- TOC -->
+- [Axioms](#axioms)
+    - [Solution Architecture](#solution-architecture)
+    - [Solution Design](#solution-design)
+- [Why](#why)
+    - [Separate business logic and implementation](#separate-business-logic-and-implementation)
+    - [Avoid or at least postpone costly lock-in decisions](#avoid-or-at-least-postpone-costly-lock-in-decisions)
+    - [Carefully embrace imperfection of abstraction](#carefully-embrace-imperfection-of-abstraction)
+        - [No-abstraction camp](#no-abstraction-camp)
+        - [The full abstraction camp](#the-full-abstraction-camp)
+        - [Anthill](#anthill)
+- [Hello world](#hello-world)
+    - [Business logic is separate from the infrastructure.](#business-logic-is-separate-from-the-infrastructure)
+    - [Docker implementation.](#docker-implementation)
+    - [How does this all work?](#how-does-this-all-work)
+    - [And now let's deploy the same to AWS.](#and-now-lets-deploy-the-same-to-aws)
+- [Q&A](#qa)
+    - [How is anthill different from AWS CDK, Pulumi?](#how-is-anthill-different-from-aws-cdk-pulumi)
+    - [How is it different from dapr.io?](#how-is-it-different-from-daprio)
+    - [What if I want to use, say, AWS Athena?](#what-if-i-want-to-use-say-aws-athena)
+- [TODO](#todo)
+<!-- /TOC -->
 
-Now since you're still here, let's define some axioms.
+
+
+Now since you're still here, let's define some 
+
+## Axioms
 
 ### Solution Architecture
 High level description of components of the solution.
@@ -63,7 +89,7 @@ The vendor lock-in is solved, but one loses the advantages of vendor-specific se
 
 #### Anthill
 
-Anthill, on the other hand, takes a middle approach between the two camps. 
+Anthill, on the other hand, takes a middle-path approach between the two camps. 
 > Only parts, relevant to the solution's architecture, are minimally abstracted. 
 
 And it becomes possible thanks to the separation of architecture and design.
@@ -71,7 +97,7 @@ In addition, since the abstractions are minimal, it's possible to fine tune them
 
 Furthermore, this allows refactoring architecture whenever necessary during the project's lifecycle.
 
-Enough theory. Let's code.
+Enough talk. Let's code.
 
 ## Hello world
 
@@ -161,7 +187,10 @@ export const helloFunc = new Func<HelloInput, HelloOutput>({
 
 > Still, no assumptions of what kind of key-value store - we're still free to plug one we need. 
 
-Now, I mentioned docker implementation. Let's get back to the `hello world`.
+Now, I mentioned 
+### Docker implementation.
+
+Let's get back to the `hello world`.
 
 We have defined the solution architecture
 
@@ -274,7 +303,7 @@ The full solution's implementation using docker looks like this:
 ![API diagram](./modules/demos/hello-world/hello-world.local-docker/hello.svg)
 
 
-## How does this all work?
+### How does this all work?
 
 When we create the server's instance
 ```typescript
@@ -319,7 +348,7 @@ Now we run
 
 to stop the server and clean up the resources.
 
-And now let's deploy the same to AWS. 
+### And now let's deploy the same to AWS. 
 We will use AWS API Gateway and the code will run in a lambda function:
 ![API diagram](./modules/demos/hello-world/hello-world.aws/hello.svg)
 
@@ -352,7 +381,7 @@ You can see the whole set up under [aws-build.ts](/modules/demos/hello-world/hel
 
 And just like with docker execution, we have a single entry point under [run-lambda.ts](modules/demos/hello-world/hello-world.aws/src/run-lambda.ts) that collects what it needs to run from `process.env.ANTHILL_RUNTIME`, discovers the appropriate API and, since it's perfectly aware that it's running as an AWS Lambda, takes the payload, prepares it for the API and executes it.
 
-### In the end, by segregating areas of concern, we could 
+**In the end, by segregating areas of concern, we could** 
 - describe high-level business logic 
 - extend that to apply to different runtime targets
 - and, since every aspect is defined in typescript, any changes to the business logic will cascade to the lower levels, so the contracts between different parts will be ensured either at the compile level or at runtime.
@@ -362,29 +391,29 @@ The last part is a TODO - we need to generate JSON Schema documents from payload
 Same for the OpenApi documentation. We don't need to maintain those by hand - we can derive them from our code.
 
 ## Q&A
-Q. How is anthill different from AWS CDK, Pulumi?
+### How is anthill different from AWS CDK, Pulumi?
     
-    A: You can (and probably should) use any of those to deliver actual infrastructure (the examples here use CDKTF). 
+A: You can (and probably should) use any of those to deliver actual infrastructure (the examples here use CDKTF). 
 
-Q. How is it different from dapr.io?
+### How is it different from dapr.io?
 
     > Note. I've only superficial knowledge of Dapr.
-    A: First, Dapr uses YAML to late-bind code and infrastructure. Yuck.
-    Second, Dapr, offers a universal runtime that attempts to abstract away the target platform, thus making it closer to the full-abstraction camp. 
-    Third, if you look at the hello world* Dapr, they create an express server first - that's a very strong assumption, compared to the anthill.
+A: First, Dapr uses YAML to late-bind code and infrastructure. Yuck.
+Second, Dapr, offers a universal runtime that attempts to abstract away the target platform, thus making it closer to the full-abstraction camp. 
+Third, if you look at the hello world* Dapr, they create an express server first - that's a very strong assumption, compared to the anthill.
 
-    * https://github.com/dapr/quickstarts/tree/master/tutorials/hello-world
+* https://github.com/dapr/quickstarts/tree/master/tutorials/hello-world
 
 
-Q. What if I want to use AWS Athena?
+### What if I want to use, say, AWS Athena?
 
-    A: Think of this as those questions in certifications exams. Sounds like you have a requirement to get tabular responses using SQL. And you don't mind the response to be non-immediate (you'll have to poll using the query's id) and results coming paged.
+A: Think of this as those questions in certifications exams. Sounds like you have a requirement to get tabular responses using SQL. And you don't mind the response to be non-immediate (you'll have to poll using the query's id) and results coming paged.
 
-    This is how you'll describe your architecture and then you'll be able to plug AWS Athena, SQLite, Azure Synapse Analytics or anything else that can eventually (yes, you'll have to emulate non-immediate response if your engine responds immediately) respond with a tabular data to a SQL query.
+This is how you'll describe your architecture and then you'll be able to plug AWS Athena, SQLite, Azure Synapse Analytics or anything else that can eventually (yes, you'll have to emulate non-immediate response if your engine responds immediately) respond with a tabular data to a SQL query.
 
-    Yes, it would be moderately faster to use Athena directly, but are you 100% sure it's the right choice at this stage? If you get delayed by several days today, is it worse than realising Athena was not a good match after all a several months in and trying to switch to something else?
+Yes, it would be moderately faster to use Athena directly, but are you 100% sure it's the right choice at this stage? If you get delayed by several days today, is it worse than realising Athena was not a good match after all a several months in and trying to switch to something else?
 
-    Even if it's the right choice today, it's not guaranteed to stay so in a year. Cloud solutions are supposed to evolve over time:
+Even if it's the right choice today, it's not guaranteed to stay so in a year. Cloud solutions are supposed to evolve over time:
 
 https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-opti.html
 
@@ -392,5 +421,6 @@ https://learn.microsoft.com/en-us/azure/architecture/framework/cost/optimize-che
 
 ## TODO
 
-- Validation that all architecture components have received full implementation.
-- Docs on how anthill doesn't use OO but Entity objects to have partially implemented non-abstract classes.
+- [ ] Validation that all architecture components have received full implementation.
+
+- [ ] Docs on how anthill doesn't use OO, but Entity objects to have partially implemented non-abstract classes.
