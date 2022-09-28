@@ -47,6 +47,12 @@ export const getParentTypes: (n: ts.Node, checker: TypeChecker) => string[] = (n
     const ttype = checker.compilerObject.getTypeAtLocation(n);
 
     if (!ttype.symbol) {
+        const jointTypes = (ttype as any as { types: ts.Type[] }).types;
+
+        if (jointTypes) {
+            return jointTypes.flatMap(tt => tt.symbol?.getName());
+        }
+
         /**
          * the awkward `new func()()` doesn't have a type, but we
          * can try to extract one from the variable declaration

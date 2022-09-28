@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import { existsSync } from 'fs';
-import { NewExpression, Project, SyntaxKind, ts } from 'ts-morph';
+import { Project, ts } from 'ts-morph';
 import * as rx from 'rxjs';
 import { graphviz } from '@hpcc-js/wasm';
 import roughUp from 'rougher';
-import { collectChildren, first, getParentTypes, getParentVarDeclaration, getRootCallDeclaration, getRootVarDeclaration, nodeTypeName } from './gnomes';
+import { getParentTypes, nodeTypeName } from './gnomes';
 
 const usage = () => {
     console.error(`@anthill/vis. Generate solution diagrams from code.
@@ -36,121 +36,92 @@ const project = new Project({
 
 const checker = project.getTypeChecker();
 
-const news = project.getSourceFiles()
+const acceptedTypesForGraph = (parentTypes: Set<string>) => parentTypes.has('Archetype') ||
+    !![...parentTypes].find(el => (el ?? '').includes('TerraformResource'));
+
+const sources = project.getSourceFiles()
     .filter(f => {
         const keep = fileFilters.size ? fileFilters.has(f.getBaseName()) : true;
 
-        // console.error(`${keep ? 'keeping' : 'skipping'} ${f.getFilePath()}`);
-        return keep;
-    })
-    .flatMap(f => collectChildren(f))
-    // TODO: also collect `export declare const` vars from parent projects
-    .filter(n => n.isKind(ts.SyntaxKind.NewExpression))
-    .filter(n => {
-        const parentTypes = getParentTypes(n.compilerNode, checker);
+        // so that we don't include core maxims
+        return keep && f.getBaseName() !== 'maxim.d.ts';
+    });
 
-        const shallPass = parentTypes.includes('Archetype') ||
-            !!parentTypes.find(el => el.includes('TerraformResource')) ||
-            parentTypes.includes('<NOSYMBOL>');
-
-        console.error(nodeTypeName(n, checker), shallPass, [...new Set(getParentTypes(n.compilerNode, checker))]);
-
-        return shallPass;
-    })
-    .map(el => {
-        const ttype = checker.getTypeAtLocation(el);
-
-        // const newedName = ttype.compilerType.symbol
-        //     ? ttype.compilerType.symbol.escapedName
-        //     : el.compilerNode.getText();
-
-        const newedName = nodeTypeName(el, checker);
-
-        const parents = getParentTypes(el.compilerNode, checker);
-
-        console.error(
-            newedName,
-            parents,
-            ttype.isClassOrInterface(),
-            ttype.isObject(),
-            checker.compilerObject.typeToString(ttype.compilerType, el.compilerNode)
-        );
-
-        return el;
-    }) as NewExpression[];
-
-const inlineId = (constructedClass: string) => `<i>${constructedClass}_${Math.ceil(Math.random() * 10000)}`;
-const isInlineId = (id: string) => id.startsWith('<i>');
-
-const toHuman = (name: string) => [...name]
-    .map(c => c.toUpperCase() === c ? ` ${c}` : c)
-    .join('')
-    .toLowerCase();
-
-const newDeclarations = news.map(n => {
-    const parentVar = getParentVarDeclaration(n);
-
-    const inlineHostVar = parentVar ? [] : getRootVarDeclaration(n);
-
-    const refs = [
-        ...(parentVar?.findReferencesAsNodes()
-            .flatMap(r => getRootVarDeclaration(r)) ?? [])
-            .filter(el => !!el),
-        ...inlineHostVar
-    ];
-
-    const calls = parentVar?.findReferencesAsNodes()
-        .flatMap(r => getRootCallDeclaration(r) ?? [])
-        .filter(el => !!el)
-        .flatMap(c => c.getChildrenOfKind(SyntaxKind.Identifier))
-        .map(c => c.getText())
-        .filter(el => !!el) as string[] ?? [];
-
-    const calls2 = parentVar?.findReferencesAsNodes()
-        .flatMap(r => getRootCallDeclaration(r) ?? [])
-        .filter(el => !!el)
-        .flatMap(c => ({
-            who: c.getParent()?.getChildrenOfKind(SyntaxKind.Identifier),
-            how: c.getChildrenOfKind(SyntaxKind.Identifier)
-        }))
-        .map(({ who, how }) => ({
-            who: first(who)?.getSymbol()?.getName(),
-            how: how.map(h => h.getText())
-        })) ?? [];
-
-    console.error(calls);
-
-    const constructedClass = nodeTypeName(n, checker);
-    // .getChildrenOfKind(ts.SyntaxKind.Identifier)
-    // .map(c => c.getText())[0];
-
-    return {
-        name: parentVar?.getName() ?? inlineId(constructedClass),
-        class: constructedClass,
-        refs: [
-            ...new Set([
-                ...(refs ?? []).map(r => r.getName()),
-                ...calls
-            ])
-        ],
-        rels: {
-            refs: (refs ?? []).map(r => r.getName()),
-            calls,
-            calls2
+const vars = sources
+    .flatMap(f => f.getDescendantsOfKind(ts.SyntaxKind.VariableDeclaration))
+    .map(v => ({
+        self: v,
+        name: v.getStructure().name
+    }))
+    .map(v => ({
+        ...v,
+        varTypes: [...new Set([
+            ...v.self.getChildrenOfKind(ts.SyntaxKind.NewExpression),
+            ...v.self.getChildrenOfKind(ts.SyntaxKind.TypeReference)
+        ])]
+    }))
+    .map(v => ({
+        ...v,
+        types: v.varTypes.flatMap(c => nodeTypeName(c, checker)),
+        parentTypes: new Set(v.varTypes.flatMap(c => getParentTypes(c.compilerNode, checker)))
+    }))
+    .map(v => ({
+        ...v,
+        class: v.types[0],
+        refs: v.self.findReferencesAsNodes().map(ref => ref.getFirstAncestorByKind(ts.SyntaxKind.VariableDeclaration))
+    }))
+    .map(v => ({
+        ...v,
+        refs: v.refs
+            .map(ref => ref?.getStructure().name)
+            .filter(ref => !!ref) as string[]
+    }))
+    .map(v => {
+        if (!acceptedTypesForGraph(v.parentTypes)) {
+            console.error(v.name, v.parentTypes, 'not an archetype');
+            const tt = v.varTypes.flatMap(c => getParentTypes(c.compilerNode, checker));
         }
-    };
-})
+
+        return v;
+    })
+    .filter(v => acceptedTypesForGraph(v.parentTypes))
     // sort by class name so that Api will go first, etc
     .sort((a, b) => (a.class || '').localeCompare(b.class));
 
-const nodeUid = (node: { name: string; class: string; refs: string[] }) =>
-    `${node.name} | ${node.class}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
+const inlineId = (constructedClass: string) => `<i>${constructedClass}_${Math.ceil(Math.random() * 10000)}`;
 
-console.error(JSON.stringify(newDeclarations, null, 2));
+const isInlineId = (id: string) => id.startsWith('<i>');
 
-const kinds = newDeclarations
+const inlines = sources
+    .flatMap(f => f.getDescendantsOfKind(ts.SyntaxKind.NewExpression))
+    // we don't need those assigned to vars
+    .filter(n => n.getParentIfKind(ts.SyntaxKind.PropertyAssignment))
+    .map(n => ({
+        node: n,
+        hostVar: n.getFirstAncestorByKind(ts.SyntaxKind.VariableStatement)
+    }))
+    .map(n => ({
+        // ...n,
+        refs: [n.hostVar?.getStructure().declarations[0].name ?? ''],
+        // v: n.getFirstAncestorByKind(ts.SyntaxKind.VariableDeclaration)?.getText(),
+        class: nodeTypeName(n.node, checker),
+        parentTypes: new Set(getParentTypes(n.node.compilerNode, checker)),
+        txt: n.node.getText()
+    }))
+    .map(n => ({
+        ...n,
+        name: inlineId(n.class)
+    }))
+    .filter(n => acceptedTypesForGraph(n.parentTypes));
+
+const combinedNodes = [...vars, ...inlines];
+
+const kinds = combinedNodes
     .map(d => d.class)
     .filter(el => !!el);
+
+console.error(combinedNodes);
+// console.log(inlines);
 
 const palette = [
     '#3bfdea', '#62ffd1', '#88ffb5', '#aeff9b', '#d4fd83', '#f9f871', '#00ddf8',
@@ -166,19 +137,27 @@ const legendDef = legend
     .map(([kind, color]) => `"${kind}" [ style=filled; fillcolor="${color}" ]`)
     .join('\n');
 
+const nodeUid = (node: { name: string; class: string }) =>
+    `${node.name} | ${node.class}`.replaceAll(/[^0-9a-zA-Z]/g, '_');
+
+const toHuman = (name: string) => [...name]
+    .map(c => c.toUpperCase() === c ? ` ${c}` : c)
+    .join('')
+    .toLowerCase();
+
 rx.from(legend).pipe(
     rx.map(([kind]) => kind),
     rx.bufferCount(7),
     rx.map(ten => ten.join('->')),
     rx.reduce((sofar, curr) => `${sofar}\n${curr}`)
 ).subscribe(legendRel => {
-    const archDot = newDeclarations
+    const archDot = combinedNodes
         .map(d => `${nodeUid(d)} [label="${toHuman(isInlineId(d.name) ? d.class : d.name)}"; style=filled fillcolor="${colorMap.get(d.class) ?? ''}" ]`)
         .join('\n');
 
-    const nameMap = new Map(newDeclarations.map(d => [d.name, d]));
+    const nameMap = new Map(combinedNodes.map(d => [d.name, d]));
 
-    const archRels = newDeclarations
+    const archRels = combinedNodes
         .filter(d => d.refs.length)
         .flatMap(d => d.refs
             .filter(from => nameMap.has(from))
@@ -187,35 +166,35 @@ rx.from(legend).pipe(
         ).join('\n');
 
     const lay2 = `
-    digraph G {
-        node [shape=rect];
-        edge [color=black];
-        splines=ortho;
-        rankdir=LR;
-        rank=same;
-        bgcolor="white";
-
-        subgraph cluster_legend {
-            color=white
-            edge [style=invis] 
-
-            ${legendDef}
-            ${legendRel}
-
-            label = "legend";
-            rankdir=LR
-            rank=same
+        digraph G {
+            node [shape=rect];
+            edge [color=black];
+            splines=ortho;
+            rankdir=LR;
+            rank=same;
+            bgcolor="white";
+    
+            subgraph cluster_legend {
+                color=white
+                edge [style=invis] 
+    
+                ${legendDef}
+                ${legendRel}
+    
+                label = "legend";
+                rankdir=LR
+                rank=same
+            }
+    
+            subgraph cluster_arch {
+                color=white
+                ${archDot}
+                
+                ${archRels}
+            }
+    
         }
-
-        subgraph cluster_arch {
-            color=white
-            ${archDot}
-            
-            ${archRels}
-        }
-
-    }
-    `;
+        `;
 
     console.error(lay2);
 
