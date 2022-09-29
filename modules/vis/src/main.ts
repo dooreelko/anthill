@@ -44,7 +44,7 @@ const sources = project.getSourceFiles()
         const keep = fileFilters.size ? fileFilters.has(f.getBaseName()) : true;
 
         // so that we don't include core maxims
-        return keep && f.getBaseName() !== 'maxim.d.ts';
+        return keep && f.getBaseName() !== 'maxim.d.ts' && f.getBaseName() !== 'maxim.ts';
     });
 
 const vars = sources
@@ -76,14 +76,6 @@ const vars = sources
             .map(ref => ref?.getStructure().name)
             .filter(ref => !!ref) as string[]
     }))
-    .map(v => {
-        if (!acceptedTypesForGraph(v.parentTypes)) {
-            console.error(v.name, v.parentTypes, 'not an archetype');
-            const tt = v.varTypes.flatMap(c => getParentTypes(c.compilerNode, checker));
-        }
-
-        return v;
-    })
     .filter(v => acceptedTypesForGraph(v.parentTypes))
     // sort by class name so that Api will go first, etc
     .sort((a, b) => (a.class || '').localeCompare(b.class));

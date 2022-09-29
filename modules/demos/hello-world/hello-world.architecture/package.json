@@ -4,6 +4,7 @@
     "private": "true",
     "description": "Minimal app using @anthill. Architecture",
     "main": "dist/src/main.js",
+    "types": "src/main.ts",
     "scripts": {
         "get": "cdktf get",
         "build": "tsc",
