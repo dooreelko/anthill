@@ -10,9 +10,7 @@
         "compile": "tsc --pretty && npm run post-build",
         "post-build": "chmod u+x ./dist/src/main.js",
         "watch": "tsc --watch --pretty",
-        "test": "jest",
-        "lint": "eslint $npm_config_local_prefix",
-        "test:watch": "jest --watch"
+        "lint": "eslint $npm_config_local_prefix"
     },
     "publishConfig": {
         "access": "public",

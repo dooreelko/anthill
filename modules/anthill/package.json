@@ -7,9 +7,7 @@
     "scripts": {
         "build": "tsc",
         "compile": "tsc --pretty",
-        "watch": "tsc --watch --pretty",
-        "test": "jest",
-        "test:watch": "jest --watch"
+        "watch": "tsc --watch --pretty"
     },
     "publishConfig": {
         "access": "public",

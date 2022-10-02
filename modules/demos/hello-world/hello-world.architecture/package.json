@@ -11,8 +11,6 @@
         "clean": "rm -rf dist",
         "compile": "tsc --pretty && npm run post-build",
         "watch": "tsc --watch --pretty && npm run post-build",
-        "test": "jest",
-        "test:watch": "jest --watch",
         "vis": "vis tsconfig.json > hello.svg",
         "lint": "eslint $npm_config_local_prefix"
     },

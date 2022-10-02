@@ -1,5 +1,5 @@
 {
-    "name": "anthill-root",
+    "name": "@arinoto/root",
     "private": true,
     "version": "1.0.0",
     "description": "Architecture as code with pluggable design",
@@ -23,13 +23,12 @@
         "typescript": "^4.8.2"
     },
     "scripts": {
-        "bootstrap": "npx lerna bootstrap",
+        "bootstrap": "npx lerna bootstrap && npx lerna link",
         "tsc": "tsc --build --verbose && lerna run post-build",
         "rebuild": "npm run clean && npm run build",
         "vis:all": "lerna run vis && lerna run vis:arch",
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
-        "test": "lerna run test",
-        "lint": "lerna run lint"
+        "ci:test-all": "$npm_config_local_prefix/ci/test-all.sh"
     },
     "repository": {
         "type": "git",
