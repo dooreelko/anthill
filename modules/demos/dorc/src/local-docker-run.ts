@@ -138,7 +138,7 @@ export const build = (stack: TerraformStack) => {
         }
     };
 
-    new ApiServer(mainServer, () => run(mainServer));
+    const apiServer = new ApiServer(mainServer, () => run(mainServer));
 
     const imageCtx = apiServerBuildContext(__dirname, 'api-server.Dockerfile');
 
