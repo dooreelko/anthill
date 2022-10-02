@@ -1,7 +1,7 @@
 
 import {
     Func, Api
-} from '@anthill/core';
+} from '@arinoto/core';
 
 // Architectural entities
 

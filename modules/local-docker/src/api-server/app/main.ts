@@ -1,7 +1,7 @@
 import Koa = require('koa');
 import logger = require('koa-logger');
 import koaBody = require('koa-body');
-import { ApiServerListener, ApiServerProps } from '@anthill/core';
+import { ApiServerListener, ApiServerProps } from '@arinoto/core';
 import { DockerListener } from '../api-server';
 
 export const apiInventory = {};

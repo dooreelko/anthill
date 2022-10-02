@@ -1,12 +1,34 @@
 import { CallExpression, Node, ts, TypeChecker, VariableDeclaration } from 'ts-morph';
 
+export enum WalkChoice {
+    Return,
+    Next,
+    Abort
+};
+
+export const findUp: (from: Node, selector: (n: Node) => WalkChoice) => Node | undefined = (from: Node, selector: (n: Node) => WalkChoice) => {
+    const parent = from.getParent();
+    if (!parent) {
+        return;
+    }
+
+    const isGood = selector(parent);
+    if (isGood === WalkChoice.Return) {
+        return parent;
+    } else if (isGood === WalkChoice.Next) {
+        return findUp(parent, selector);
+    }
+
+    return;
+};
+
 export const collectChildren: (n: Node) => Node[] = (n: Node) => {
     return [n, ...n.getChildren().flatMap(collectChildren)];
 };
 
 export const squeezeType = (ttype: ts.Type, checker: TypeChecker) => {
-    const decs = (ttype.symbol.declarations ?? []) as ts.ClassLikeDeclarationBase[];
-    const valueDec = (ttype.symbol.valueDeclaration as ts.ClassLikeDeclarationBase);
+    const decs = (ttype.symbol?.declarations ?? []) as ts.ClassLikeDeclarationBase[];
+    const valueDec = (ttype.symbol?.valueDeclaration as ts.ClassLikeDeclarationBase);
 
     const parents = [...decs, valueDec]
         .filter(el => !!el)
@@ -27,7 +49,6 @@ export const squeezeType = (ttype: ts.Type, checker: TypeChecker) => {
     ];
 };
 
-// TODO: doesn't work
 export const getVarType = (n: ts.Node, checker: TypeChecker) => {
     if (n.kind !== ts.SyntaxKind.VariableDeclaration) {
         return '<NOTVAR>';
@@ -47,6 +68,15 @@ export const getParentTypes: (n: ts.Node, checker: TypeChecker) => string[] = (n
     const ttype = checker.compilerObject.getTypeAtLocation(n);
 
     if (!ttype.symbol) {
+        const jointTypes = (ttype as any as { types: ts.Type[] }).types;
+
+        if (jointTypes) {
+            const parentTypes = jointTypes.flatMap(t => squeezeType(t, checker));
+            const selfTypes = jointTypes.flatMap(tt => tt.symbol?.getName());
+
+            return [...parentTypes, ...selfTypes];
+        }
+
         /**
          * the awkward `new func()()` doesn't have a type, but we
          * can try to extract one from the variable declaration
@@ -56,14 +86,6 @@ export const getParentTypes: (n: ts.Node, checker: TypeChecker) => string[] = (n
         }
 
         return [getVarType(n.parent, checker)];
-        // const vartype = checker.compilerObject.getTypeAtLocation(n.parent);
-
-        // const maybeTypes = (vartype as any).types as ts.Type[] | undefined;
-        // if (maybeTypes) {
-        //     return maybeTypes.flatMap(squeezeType);
-        // }
-
-        // return ['<NOSYMBOL>'];
     }
 
     const typeArgs = (n as any).typeArguments as ts.NodeArray<ts.TypeNode> | undefined;
@@ -108,3 +130,5 @@ export const getParentVarDeclaration = (n: Node) => n
     .getParentIfKind(ts.SyntaxKind.VariableDeclaration);
 
 export const first = <T>(arr?: T[]) => arr?.length ? arr[0] : undefined;
+
+export const uniq = <T>(arr: T[]) => [...new Set(arr)];

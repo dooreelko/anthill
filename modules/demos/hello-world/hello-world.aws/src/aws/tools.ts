@@ -1,4 +1,4 @@
-import { ApiContext } from '@anthill/core';
+import { ApiContext } from '@arinoto/core';
 
 export const splitStageAndPath = (path: string) => {
     const parts = path.split('/').filter(p => !!p);

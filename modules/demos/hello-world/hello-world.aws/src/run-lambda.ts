@@ -1,4 +1,4 @@
-import { ApiServer, HttpMethod } from '@anthill/core';
+import { ApiServer, HttpMethod } from '@arinoto/core';
 import './aws-architecture';
 import { buildRouteKey } from './aws/tools';
 

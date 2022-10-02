@@ -1,7 +1,7 @@
-import * as arch from '@anthill/hello-world.architecture';
+import * as arch from '@arinoto/hello-world.architecture';
 
-import { ApiServer, ApiServerProps, ApiServerListener } from '@anthill/core';
-import { run } from '@anthill/local-docker';
+import { ApiServer, ApiServerProps, ApiServerListener } from '@arinoto/core';
+import { run } from '@arinoto/local-docker';
 
 export type DockerListener = ApiServerListener & {
     host: string;

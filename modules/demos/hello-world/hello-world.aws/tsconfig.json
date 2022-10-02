@@ -6,13 +6,13 @@
     },
     "references": [
         {
-            "path": "../../../anthill/tsconfig.json"
+            "path": "../../../anthill"
         },
         {
-            "path": "../../../vis/tsconfig.json"
+            "path": "../../../vis"
         },
         {
-            "path": "../hello-world.architecture/tsconfig.json"
+            "path": "../hello-world.architecture"
         }
     ],
     "include": [

@@ -1,10 +1,13 @@
 {
     "name": "@arinoto/vis",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "@anthill's architecture visualiser",
     "main": "dist/src/main.js",
     "types": "dist/src/main.d.ts",
-    "bin": "dist/src/main.js",
+    "bin": {
+        "vis": "dist/src/main.js",
+        "code2graph": "dist/src/code2graph.js"
+    },
     "scripts": {
         "build": "tsc && npm run post-build",
         "compile": "tsc --pretty && npm run post-build",
@@ -26,10 +29,14 @@
         "rxjs": "^7.5.6",
         "safe-stable-stringify": "^2.3.1",
         "ts-morph": "^15.1.0",
-        "viz.js": "^2.1.2"
+        "yargs": "17.5.1",
+        "viz.js": "^2.1.2",
+        "lodash": "^4.17.21"
     },
     "devDependencies": {
-        "@arinoto/eslint-config": "*"
+        "@arinoto/eslint-config": "*",
+        "@types/yargs": "^17.0.13",
+        "@types/lodash": "^4.14.0"
     },
     "repository": {
         "type": "git",

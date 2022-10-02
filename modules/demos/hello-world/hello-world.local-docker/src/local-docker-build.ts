@@ -1,7 +1,7 @@
 import { TerraformStack, TerraformOutput } from 'cdktf';
 import { Container, DockerProvider, Image } from '@cdktf/provider-docker';
 
-import { apiServerBuildContext } from '@anthill/local-docker';
+import { apiServerBuildContext } from '@arinoto/local-docker';
 
 import { mainApi } from './docker-architecture';
 

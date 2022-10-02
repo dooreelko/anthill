@@ -3,12 +3,11 @@
     "version": "1.0.0",
     "description": "Architecture as code with pluggable design, main library",
     "main": "dist/src/main.js",
+    "types": "src/main.ts",
     "scripts": {
         "build": "tsc",
         "compile": "tsc --pretty",
-        "watch": "tsc --watch --pretty",
-        "test": "jest",
-        "test:watch": "jest --watch"
+        "watch": "tsc --watch --pretty"
     },
     "publishConfig": {
         "access": "public",

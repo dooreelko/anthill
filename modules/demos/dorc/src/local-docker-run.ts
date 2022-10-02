@@ -1,7 +1,7 @@
 import * as arch from './architecture';
 import { TerraformStack, TerraformOutput } from "cdktf";
 import { Container, DockerProvider, Image } from "@cdktf/provider-docker";
-import { ApiServer, ContainerStateEvent } from '@anthill/core';
+import { ApiServer, ContainerStateEvent } from '@arinoto/core';
 import {
     apiServerBuildContext,
     DockerQueue,
@@ -10,7 +10,7 @@ import {
     DockerRuntime, DummyAutoscaler,
     run,
     DockerApiServerProps
-} from '@anthill/local-docker';
+} from '@arinoto/local-docker';
 
 import { taskQueuePoller } from './architecture';
 
@@ -138,7 +138,7 @@ export const build = (stack: TerraformStack) => {
         }
     };
 
-    new ApiServer(mainServer, () => run(mainServer));
+    const apiServer = new ApiServer(mainServer, () => run(mainServer));
 
     const imageCtx = apiServerBuildContext(__dirname, 'api-server.Dockerfile');
 

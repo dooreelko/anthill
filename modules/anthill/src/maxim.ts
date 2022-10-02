@@ -110,7 +110,7 @@ export type ApiServerListener = {
     }[];
 };
 
-export type ApiServerProps<TListener extends ApiServerListener = ApiServerListener> = {
+export type ApiServerProps<TListener extends ApiServerListener = ApiServerListener> = Archetype & {
     name: string;
     listener: TListener;
 };

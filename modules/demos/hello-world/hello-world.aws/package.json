@@ -1,6 +1,6 @@
 {
     "name": "@arinoto/hello-world.aws",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "private": "true",
     "description": "Minimal app using @anthill, aws run",
     "main": "dist/src/main.js",
@@ -15,8 +15,6 @@
         "destroy": "cdktf destroy --auto-approve || true",
         "compile": "tsc --pretty && npm run post-build",
         "watch": "tsc --watch --pretty && npm run post-build",
-        "test": "jest",
-        "test:watch": "jest --watch",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
         "upgrade:next": "npm i cdktf@next cdktf-cli@next",
         "vis:arch": "vis tsconfig.json architecture.ts aws-architecture.ts > hello-arch.svg",
