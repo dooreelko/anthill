@@ -11,8 +11,8 @@ export type ParseConfig = {
     verbose: boolean;
 };
 
-export const argv = yargs(process.argv.slice(2))
-    .usage('Usage: $0 -includeFiles regex1 regex2 -acceptTypes regex1 regex2 [-path] [path/to/tsconfig.json]')
+export const argv = async (name: string) => yargs(process.argv.slice(2))
+    .usage(`Usage: ${name} -includeFiles regex1 regex2 -acceptTypes regex1 regex2 [-path] [path/to/tsconfig.json]`)
     .options({
         acceptTypes: {
             type: 'string',
@@ -47,8 +47,8 @@ export const argv = yargs(process.argv.slice(2))
         }
     }).argv;
 
-export const cmdArgs = async () => {
-    const args = await argv;
+export const cmdArgs = async (name: string) => {
+    const args = await argv(name);
 
     const tsConfigPath = args['*'];
     const fileFilters = args.files;

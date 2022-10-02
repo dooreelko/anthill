@@ -182,7 +182,7 @@ export const code2graph = (opts: ParseConfig) => {
 };
 
 if (require.main === module) {
-    cmdArgs().then((args) => {
+    cmdArgs('code2graph').then((args) => {
 
         code2graph(args)
             .pipe(rx.toArray())
