@@ -6,7 +6,7 @@ import roughUp from 'rougher';
 import { code2graph } from './code2graph';
 import { cmdArgs } from './cmdline';
 
-cmdArgs().then((args) => {
+cmdArgs('vis').then((args) => {
     code2graph(args).pipe(rx.toArray())
         .subscribe(nodes => {
 

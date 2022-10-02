@@ -17,7 +17,6 @@
         "watch": "tsc --watch --pretty && npm run post-build",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
         "upgrade:next": "npm i cdktf@next cdktf-cli@next",
-        "vis:arch": "vis tsconfig.json architecture.ts aws-architecture.ts > hello-arch.svg",
         "vis": "vis tsconfig.json > hello.svg",
         "lint": "eslint $npm_config_local_prefix"
     },
