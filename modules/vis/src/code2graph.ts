@@ -137,7 +137,7 @@ export const code2graph = (opts: ParseConfig) => {
                         }
                     }
                 }
-                console.error(`Failed getting proper architectural host for inline ${n.node.getText()}`);
+                console.error(`Warning. Failed getting proper architectural host for inline ${n.node.getText()}. Will treat that as a no-ref inline var.`);
 
                 /**
                  * If somebody decides to have a free hanging 
