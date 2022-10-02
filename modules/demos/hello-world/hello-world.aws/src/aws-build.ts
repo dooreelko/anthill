@@ -4,7 +4,7 @@ import { TerraformOutput, TerraformStack, TerraformVariable } from 'cdktf';
 import * as aws from '@cdktf/provider-aws';
 import * as zip from '@cdktf/provider-archive';
 
-import { findBuildContextRoot } from '@anthill/core';
+import { findBuildContextRoot } from '@arinoto/core';
 import { mainServer } from './aws-architecture';
 import { buildRouteKey, splitStageAndPath } from './aws/tools';
 

@@ -1,5 +1,5 @@
-import { ApiServer, ApiServerProps } from '@anthill/core';
-import * as arch from '@anthill/hello-world.architecture';
+import { ApiServer, ApiServerProps } from '@arinoto/core';
+import * as arch from '@arinoto/hello-world.architecture';
 
 /** CONCRETE SOLUTION IMPLEMENTATION */
 

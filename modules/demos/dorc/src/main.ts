@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import { App, TerraformStack } from "cdktf";
 import { build as buildLocal } from './local-docker-run';
-import { runtimeRegistry } from "@anthill/core";
 
 export const build = () => {
     class DorcStack extends TerraformStack {

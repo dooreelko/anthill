@@ -1,6 +1,6 @@
 import path = require('path');
 import fetch from 'node-fetch';
-import * as maxim from '@anthill/core';
+import * as maxim from '@arinoto/core';
 import { enrichPath } from './app/main';
 
 export type DockerListener = maxim.ApiServerListener & {
