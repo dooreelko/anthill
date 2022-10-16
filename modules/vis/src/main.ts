@@ -2,7 +2,7 @@
 
 import * as rx from 'rxjs';
 import { graphviz } from '@hpcc-js/wasm';
-import roughUp from 'rougher';
+import roughUp, { Options } from '@arinoto/rougher';
 import { code2graph } from './code2graph';
 import { cmdArgs } from './cmdline';
 
@@ -89,16 +89,29 @@ cmdArgs('vis').then((args) => {
         
         ${archRels}
     }
-
 }`;
 
                 console.error(lay2);
 
                 const options = {
                     stroke: '#ffffff',
-                    hachureGap: 0.5,
+                    roughness: 0.5,
+                    hachureGap: 3,
                     fill: '#ffffff',
-                    fillStyle: 'hachure'
+                    fillStyle: 'hachure',
+
+                    customOptions: (path: string[], element: SVGElement, options: Options) => {
+
+                        // console.error('yo', path, element.parentElement?.querySelector('title')?.innerHTML);
+                        if (path.length === 3) {
+                            return {
+                                ...options,
+                                fillStyle: 'solid'
+                            };
+                        }
+
+                        return undefined;
+                    }
                 };
 
                 graphviz

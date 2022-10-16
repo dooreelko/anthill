@@ -35,15 +35,12 @@ const processDir: (dir: string) => ToCopy[] = (dir: string) => {
 
     if (from !== dir) {
         const fromGlob = path.join(dir, '**');
-        const notGlob = path.join(dir, 'node_modules');
         const intoDest = path.join(into, dir);
-        // console.error(`will copy from ${fromGlob} but not ${notGlob} into ${intoDest}`);
-        // console.error(`${fromGlob} -> ${intoDest}`);
 
         selfs = [{
             source: [
-                fromGlob
-                // `!${notGlob}`
+                fromGlob,
+                '!**/.git/**'
             ],
             dest: intoDest
         }];
@@ -75,12 +72,7 @@ await Promise.all(
         })
         .map(tocopy =>
             copy(tocopy.source, tocopy.dest, {
-                ignoreJunk: true,
-                filter: srcFile => {
-                    // console.error(`copying ${srcFile.relativePath}`);
-
-                    return true;
-                }
+                ignoreJunk: true
             })
         )
 )

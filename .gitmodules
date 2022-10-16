@@ -1,0 +1,3 @@
+[submodule "modules/tools/rougher"]
+	path = modules/tools/rougher
+	url = git@github.com:dooreelko/rougher.git

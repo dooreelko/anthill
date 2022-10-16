@@ -24,8 +24,8 @@
     },
     "scripts": {
         "bootstrap": "npx lerna bootstrap && npx lerna link",
-        "tsc": "tsc --build --verbose && lerna run post-build",
-        "rebuild": "npm run clean && npm run build",
+        "tsc": "tsc --build --verbose && lerna run build --scope @arinoto/rougher && lerna run post-build",
+        "rebuild": "npm run clean && npm run tsc",
         "vis:all": "lerna run vis && lerna run vis:arch",
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
         "ci:test-all": "$npm_config_local_prefix/ci/test-all.sh"
