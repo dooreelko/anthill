@@ -4,8 +4,6 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -16,17 +14,29 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - name: Checkout with submodules
+    - name: Checkout
       uses: actions/checkout@v3
       with:
-        submodules: recursive
+        ref: main
+        fetch-depth: 0
+    - run: git fetch origin $GITHUB_HEAD_REF
+    - run: git switch $GITHUB_HEAD_REF
+    - run: git branch --list
+    - run: git submodule foreach --recursive git config --local gc.auto 0
+    - run: git config user.email "robot@example.com"
+    - run: git config user.name "Myname Willbe Discarded"
+    - run: git merge main
+    - run: git branch --list
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm run ci:test-all
+    - run: npx lerna exec -- rm -rf package-lock.json
+    - run: env
+    - run: GITHUB_ACTIONS='' npm run ci:test-all
+    - run: npm run ci:publish-check
