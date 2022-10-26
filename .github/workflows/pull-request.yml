@@ -21,22 +21,22 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        ref: main
-        fetch-depth: 0
-    - run: git fetch origin $GITHUB_HEAD_REF
+        fetch-depth: 1
+    - run: env
+    - run: git fetch origin $GITHUB_HEAD_REF:$GITHUB_HEAD_REF
+    - run: git fetch origin main:main
     - run: git switch $GITHUB_HEAD_REF
     - run: git branch --list
-    - run: git submodule foreach --recursive git config --local gc.auto 0
     - run: git config user.email "robot@example.com"
     - run: git config user.name "Myname Willbe Discarded"
     - run: git merge main
-    - run: git branch --list
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npx lerna exec -- rm -rf package-lock.json
-    - run: env
-    - run: GITHUB_ACTIONS='' npm run ci:test-all
+        cache: 'yarn'
+    - run: npx lerna list --all
+    - run: npm run bootstrap
+    - run: npm run tsc
+    - run: npx lerna run test
     - run: npm run ci:publish-check

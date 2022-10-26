@@ -20,11 +20,12 @@
         "nx": "^14.5.4",
         "ts-jest": "^28.0.7",
         "ts-node": "^10.9.1",
-        "typescript": "^4.8.2"
+        "typescript": "^4.8.2",
+        "yarn": "1.22.19"
     },
     "scripts": {
-        "bootstrap": "npx lerna bootstrap && npx lerna link",
-        "tsc": "tsc --build --verbose && lerna run build --scope @arinoto/rougher && lerna run post-build",
+        "bootstrap": "$npm_config_local_prefix/ci/bootstrap.sh",
+        "tsc": "tsc --build --verbose && lerna run post-build",
         "rebuild": "npm run clean && npm run tsc",
         "vis:all": "lerna run vis && lerna run vis:arch",
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
