@@ -8,29 +8,11 @@ SCRIPT_DIR="$ROOT_DIR/ci"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/git-helpers.sh"
 
-CHANGED=$(list-changed-modules)
+TO_BUMP=$(list-packages-needing-version-bump)
+HAS_TO_BUMP=$(echo "$TO_BUMP" | wc -l)
 
-HAS_TO_BUMP=0
-TO_BUMP=''
-
-for mod in $CHANGED; do 
-    REMOTE=$(npm info "$mod" --json | jq -r ._id)
-    LOCAL=$(npx lerna exec --scope "$mod" -- jq -r "'.name + \"@\" + .version'" package.json)
-    
-    if [ "$REMOTE" = "$LOCAL" ]; then
-        TO_BUMP="$TO_BUMP
-        $mod"
-        HAS_TO_BUMP=$(( HAS_TO_BUMP + 1 ))
-    fi 
-done
-
-if [ $HAS_TO_BUMP -gt 0 ]; then
+if [ "$HAS_TO_BUMP" -gt 0 ]; then
     set +x
-    printf "%s packages need version bump:\n%s" "$HAS_TO_BUMP" "$TO_BUMP" 
+    printf "\n\n\n%s packages need version bump:\n%s" "$HAS_TO_BUMP" "$TO_BUMP" 
     exit 1
 fi
-# REMOTE=$(list-changed-modules | xargs -I{} bash -c 'npm info {} --json | jq -r ._id' | sort)
-
-# LOCAL=$(list-changed-modules | xargs -I{} npx lerna exec --scope {} -- jq -r "'.name + \"@\" + .version'" package.json | sort)
-
-# diff -u <(echo "$REMOTE") <(echo "$LOCAL") 

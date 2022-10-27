@@ -1,6 +1,6 @@
 {
     "name": "@arinoto/lambda-dist",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "@anthill's aws lambda/layer dist organizer",
     "main": "dist/src/main.js",
     "bin": "dist/src/main.js",

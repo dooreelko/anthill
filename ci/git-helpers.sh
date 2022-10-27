@@ -19,3 +19,21 @@ function list-changed-modules() {
         xargs -I{} bash -c "echo '$CHANGEDS' | grep --silent {} && echo {} || true" |\
         xargs -I{} jq -r '.name' "$ROOT_DIR/{}/package.json"
 }
+
+function list-packages-needing-version-bump() {
+    CHANGED=$(list-changed-modules)
+
+    TO_BUMP=''
+
+    for mod in $CHANGED; do 
+        REMOTE=$(npm info "$mod" --json | jq -r ._id)
+        LOCAL=$(npx lerna exec --loglevel silent --scope "$mod" -- jq -r "'.name + \"@\" + .version'" package.json)
+        
+        if [ "$REMOTE" = "$LOCAL" ]; then
+            TO_BUMP="$TO_BUMP
+            $mod"
+        fi 
+    done
+
+    echo "$TO_BUMP"
+}
