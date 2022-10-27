@@ -10,12 +10,12 @@ function list-changed-files() {
 }
 
 function list-changed-modules() {
-    local CHANGED
-    CHANGED=$(list-changed-files)
+    local CHANGEDS
+    CHANGEDS=$(list-changed-files)
     
     npx lerna list --json |\
         jq -r '.[].location' |\
         xargs realpath --relative-to "$ROOT_DIR" |\
-        xargs -I{} bash -c "echo '$CHANGED' | grep --silent {} && echo {}" |\
+        xargs -I{} bash -c "echo '$CHANGEDS' | grep --silent {} && echo {} || true" |\
         xargs -I{} jq -r '.name' "$ROOT_DIR/{}/package.json"
 }
