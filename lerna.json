@@ -2,6 +2,7 @@
     "$schema": "node_modules/lerna/schemas/lerna-schema.json",
     "useNx": false,
     "useWorkspaces": false,
+    "npmClient": "yarn",
     "version": "1.0.0",
     "packages": [
         ".",
