@@ -9,10 +9,10 @@ SCRIPT_DIR="$ROOT_DIR/ci"
 source "$SCRIPT_DIR/git-helpers.sh"
 
 TO_BUMP=$(list-packages-needing-version-bump)
-HAS_TO_BUMP=$(echo "$TO_BUMP" | wc -l)
+HAS_TO_BUMP=$(echo -n "$TO_BUMP" | wc -l)
 
 if [ "$HAS_TO_BUMP" -gt 0 ]; then
     set +x
-    printf "\n\n\n%s packages need version bump:\n%s" "$HAS_TO_BUMP" "$TO_BUMP" 
+    printf "\n\n\n%s package(s) need version bump:\n%s" "$HAS_TO_BUMP" "$TO_BUMP" 
     exit 1
 fi
