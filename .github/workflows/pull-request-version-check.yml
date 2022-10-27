@@ -1,32 +1,27 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: PR build and test
+name: PR prepublish version check
 
 on:
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  build:
+  version-check:
 
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-    - run: npm run bootstrap
-    - run: npm run tsc
-    - run: npx lerna run test
+    - run: git fetch origin $GITHUB_HEAD_REF:$GITHUB_HEAD_REF
+    - run: git fetch origin main:main
+    - run: git switch $GITHUB_HEAD_REF
+    - run: git branch --list
+    - run: git config user.email "robot@example.com"
+    - run: git config user.name "Myname Willbe Discarded"
+    - run: git merge main
+    - run: npm run ci:publish-check
