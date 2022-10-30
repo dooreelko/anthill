@@ -37,3 +37,49 @@ function list-packages-needing-version-bump() {
 
     echo "$TO_BUMP"
 }
+
+function list-packages-needing-publish() {
+    PKGS=$(npx lerna list --no-private --json | jq -r '.[].name')
+
+    for pkg in $PKGS; do
+        REMOTE=$(npm info "$pkg" --json | jq -r '.version')
+        LOCAL=$(npx lerna list --scope "$pkg" --json | jq -r '.[] | .version')
+
+        if [ "$REMOTE" != "$LOCAL" ]; then
+            echo "$pkg $REMOTE->$LOCAL"
+        fi
+    done
+}
+
+function feature-kind() {
+    git rev-parse --abbrev-ref HEAD | cut -d '/' -f1
+}
+
+function feature-story() {
+    git rev-parse --abbrev-ref HEAD | cut -d '/' -f2
+}
+
+function feature-task() {
+    git rev-parse --abbrev-ref HEAD | cut -d '/' -f3
+}
+
+function feature-dir() {    
+    ROOT_DIR="$(npx lerna list --json --all --scope @arinoto/root | jq -r .[].location)"
+    SPEC_DIR="$ROOT_DIR/spec"
+
+    shopt -u nullglob
+
+    STORY=${1:-$(feature-story)}
+
+    for f in "$SPEC_DIR/"????"$STORY"; do
+        if [ -d "$f" ]; then
+            echo "$f"
+            return 
+        fi
+    done
+
+    if [ -d "$SPEC_DIR/$STORY" ]; then
+        echo "$SPEC_DIR/$STORY"
+        return
+    fi
+}

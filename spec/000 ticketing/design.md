@@ -1,5 +1,7 @@
 # Ticketing within repo
 
+Design specifications and ticketing integrated in the project's repository.
+
 ## Idea
 
 1. Have new units of work (UOW) defined (description, design, tasks, etc) within repo
@@ -16,13 +18,16 @@
 - Branching naming convention `(feature|fix)/<storyname>[/<taskname>]`
     - `storyname` without numeric prefix
 - `design.md` file with at lease these sections (things in `<>` are free text):
-    - <Heading 1>. `<Story's title>`
+    - <Heading 1>. `<Story's title>`.
+    - <Paragraph>. `<Optional one paragraph to include in the changelog>`.
     - <Heading 2>. `Idea`. Text.
     - <Heading 2>. `Design`. Text.
     - <Heading 2>. `Tasks`. Checkbox list with items in form
     `- [ ] <taskname>. <optional task descripton text>`
+- A git hook that rejects commit if branch is not following the convention.
+- A git hook that auto-inserts story+task into commit message.
 
 ## Tasks
-- [ ] design
-- [ ] husky. Reject commit if branch is not correctly named. Auto-prepend OUW ID (`story:task`) into commit message. 
-- [ ] changelog
+- [x] design
+- [x] husky. Reject commit if branch is not correctly named. Auto-prepend OUW ID `[story|task]` into commit message. 
+- [x] changelog

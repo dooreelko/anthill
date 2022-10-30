@@ -13,7 +13,7 @@ ROOT_DIR="$(npx lerna list --json --all --scope @arinoto/root | jq -r .[].locati
 SCRIPT_DIR="$ROOT_DIR/ci"
 
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/git-helpers.sh"
+source "$SCRIPT_DIR/helpers.sh"
 
 TO_BUMP=$(list-packages-needing-version-bump)
 

@@ -4,8 +4,14 @@ set -euo pipefail
 
 export PS4='$(printf '=%.0s' {0..${SHLVL}}) ${BASH_SOURCE}:${LINENO} '
 
-STORY=$(git rev-parse --abbrev-ref HEAD | cut -d '/' -f2)
-TASK=$(git rev-parse --abbrev-ref HEAD | cut -d '/' -f3)
+ROOT_DIR="$(npx lerna list --json --all --scope @arinoto/root | jq -r .[].location)"
+SCRIPT_DIR="$ROOT_DIR/ci"
+
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/helpers.sh"
+
+STORY=$(feature-story)
+TASK=$(feature-task)
 
 PREPEND="[$STORY|${TASK:--}]"
 
