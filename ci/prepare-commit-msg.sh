@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-export PS4='$(printf '=%.0s' {0..${SHLVL}}) ${BASH_SOURCE}:${LINENO} '
-
 ROOT_DIR="$(npx lerna list --json --all --scope @arinoto/root | jq -r .[].location)"
 SCRIPT_DIR="$ROOT_DIR/ci"
 
