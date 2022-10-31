@@ -1,0 +1,8 @@
+.vscode-body {
+    color: #a0a0a0
+}
+
+.vscode-body pre {
+    color: initial;
+    background: #161b22 !important;
+}

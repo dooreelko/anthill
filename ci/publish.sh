@@ -10,8 +10,5 @@ source "$SCRIPT_DIR/helpers.sh"
 
 "$SCRIPT_DIR/publish-check.sh"
 
-npx lerna publish --no-bail from-package
-
-# for pkg in $(list-packages-needing-publish | cut -d ' ' -f1); do
-#     echo npx lerna --scope "$pkg" exec --no-bail -- npm publish
-# done
+npm run tsc
+npx lerna publish from-package --no-git-reset --yes

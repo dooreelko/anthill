@@ -1,7 +1,7 @@
 [
   {
     "story": "ticketing",
-    "title": "2022-10-30 [feature]  Ticketing within repo",
+    "title": "2022-10-31 [feature]  Ticketing within repo",
     "desc": "\nDesign specifications and ticketing integrated in the project’s\nrepository.",
     "doc": "spec/000 ticketing/design.md"
   }

@@ -47,7 +47,7 @@ function list-packages-needing-publish() {
         LOCAL=$(npx lerna list --scope "$pkg" --json | jq -r '.[] | .version')
 
         if [ "$REMOTE" != "$LOCAL" ]; then
-            echo "$pkg $REMOTE->$LOCAL"
+            echo "$pkg"
         fi
     done
 }
