@@ -3,6 +3,22 @@
 ROOT_DIR="$(npx lerna list --json --all --scope @arinoto/root | jq -r .[].location)"
 PS4='$(printf '=%.0s' {0..${SHLVL}}) ${BASH_SOURCE}:${LINENO} '
 
+if [ -n "${DEBUG:-}" ]; then
+    set -x
+fi
+
+ENDCOLOR="\e[0m";
+GREEN="\e[32m"
+RED="\e[31m"
+
+function log() {
+    >&2 echo -e "${GREEN}${1}${ENDCOLOR}" 
+}
+
+function err() {
+    >&2 echo -e "${RED}${1}${ENDCOLOR}" 
+}
+
 function list-changed-files() {
     ( 
         cd "$ROOT_DIR" && \

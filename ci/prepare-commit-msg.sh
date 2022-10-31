@@ -8,6 +8,8 @@ SCRIPT_DIR="$ROOT_DIR/ci"
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/helpers.sh"
 
+log "processing commit message..."
+
 STORY=$(feature-story)
 TASK=$(feature-task)
 
