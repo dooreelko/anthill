@@ -2,7 +2,7 @@
 
 set -exuo pipefail
 
-npm install
+npx yarn install
 
 npx lerna bootstrap --force-local
 npx lerna link

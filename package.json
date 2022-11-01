@@ -15,6 +15,7 @@
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-n": "^15.2.5",
         "eslint-plugin-promise": "^6.0.1",
+        "husky": "^8.0.1",
         "jest": "^28.1.3",
         "lerna": "6.0.1",
         "nx": "^14.5.4",
@@ -30,7 +31,8 @@
         "vis:all": "lerna run vis && lerna run vis:arch",
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
         "ci:test-all": "$npm_config_local_prefix/ci/test-all.sh",
-        "ci:publish-check": "$npm_config_local_prefix/ci/publish-check.sh"
+        "ci:publish-check": "$npm_config_local_prefix/ci/publish-check.sh",
+        "prepare": "husky install"
     },
     "repository": {
         "type": "git",
