@@ -87,8 +87,3 @@ TO_PUBLISH=$(report-packages-needing-publish)
         echo "$TO_PUBLISH"
     fi
 ) > "$ROOT_DIR/CHANGELOG.md"
-
-if ! git diff --exit-code "$ROOT_DIR/CHANGELOG.md"; then 
-    git add "$ROOT_DIR/CHANGELOG.md" "$ROOT_DIR/changelog.json"
-    git commit --amend --reuse-message=HEAD --no-verify
-fi
