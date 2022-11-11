@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+ // code: language=javascript
+
+const {
+    code2GraphCmd
+} = require('../dist/src/main');
+
+(async () => await code2GraphCmd())();

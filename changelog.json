@@ -1,5 +1,11 @@
 [
   {
+    "story": "cluster-vis",
+    "title": "2022-11-11 [feature]  Cluster together things of same class in diagrams",
+    "desc": "\nThe idea is to have APIs (and maybe more) grouped visually together in\nthe diagram. Also nice to have them on the left side of the diagram.",
+    "doc": "spec/cluster-vis/design.md"
+  },
+  {
     "story": "ticketing",
     "title": "2022-10-31 [feature]  Ticketing within repo",
     "desc": "\nDesign specifications and ticketing integrated in the project’s\nrepository.",

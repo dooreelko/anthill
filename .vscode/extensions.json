@@ -6,6 +6,7 @@
         "bierner.markdown-checkbox",
         "bierner.markdown-preview-github-styles",
         "robole.marky-dynamic",
-        "timonwong.shellcheck"
+        "timonwong.shellcheck",
+        "chrislajoie.vscode-modelines"
     ]
 }

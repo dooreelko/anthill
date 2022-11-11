@@ -1,65 +1,110 @@
-import yargs from 'yargs/yargs';
+import yargs from 'yargs';
 
 const toRegexes = (vals: string[]) => vals.map(v => new RegExp(v));
 
-export type ParseConfig = {
+export type RuntimeConfig = {
     acceptTypes: RegExp[];
     includeFiles: RegExp[];
     excludeFiles: RegExp[];
     tsConfigPath: string;
 
     verbose: boolean;
+
+    log: {
+        verbose: (...what: unknown[]) => void;
+        error: (...what: unknown[]) => void;
+    }
 };
 
-export const argv = async (name: string) => yargs(process.argv.slice(2))
-    .usage(`Usage: ${name} -includeFiles regex1 regex2 -acceptTypes regex1 regex2 [-path] [path/to/tsconfig.json]`)
+export type VisRuntimeConfig = RuntimeConfig & {
+    clusterAllTypes: boolean;
+    clusterNone: boolean;
+    clusterTypes: RegExp[];
+};
+
+export const commonOptions: Record<string, yargs.Options> = {
+    acceptTypes: {
+        type: 'string',
+        array: true,
+        default: ['Archetype', '.*TerraformResource.*'],
+        describe: "List of regexes of base classes/types to include.",
+        coerce: toRegexes
+    },
+    includeFiles: {
+        type: 'string',
+        array: true,
+        default: [],
+        describe: 'List of regexes of files to include. Defaults to accept any.',
+        coerce: toRegexes
+    },
+    excludeFiles: {
+        array: true,
+        default: ['maxim.*.ts'],
+        describe: 'List of regexes of files to exclude.',
+        coerce: toRegexes
+    },
+    verbose: {
+        boolean: true,
+        default: false,
+        describe: 'Print debugging info onto stderr'
+    },
+    tsConfigPath: {
+        type: 'string',
+        default: './tsconfig.json',
+        describe: 'Path of the tsconfig.json'
+    }
+};
+
+export const visOptions: Record<string, yargs.Options> = {
+    clusterAllTypes: {
+        type: 'boolean',
+        array: false,
+        default: false,
+        describe: "When specified will visually cluster all nodes of the same type",
+    },
+    clusterTypes: {
+        type: 'string',
+        array: true,
+        default: ['Api'],
+        describe: "List of regexes of base classes/types to cluster together. Defaults to `Api`",
+        coerce: toRegexes
+    },
+    clusterNone: {
+        type: 'boolean',
+        array: false,
+        default: false,
+        describe: "Don't cluster together any types. When present, wins over any other clustering options.",
+    },
+};
+
+export const argv = async <T extends Record<string, yargs.Options>>(desc: string, customOpts: T) => yargs(process.argv.slice(2))
+    .usage(`${desc}`)
+    .strict()
     .options({
-        acceptTypes: {
-            type: 'string',
-            array: true,
-            default: ['Archetype', '.*TerraformResource.*'],
-            describe: "List of regexes of base classes/types to include. Defaults to accept 'Archetype' and '.*TerraformResource.*'.",
-            coerce: toRegexes
-        },
-        includeFiles: {
-            type: 'string',
-            array: true,
-            default: [],
-            describe: 'List of regexes of files to include. Defaults to accept any.',
-            coerce: toRegexes
-        },
-        excludeFiles: {
-            array: true,
-            default: ['maxim.*.ts'],
-            describe: 'List of regexes of files to exclude. Defaults to `maxim.*.ts`.',
-            coerce: toRegexes
-        },
-        verbose: {
-            boolean: true,
-            default: false,
-            describe: 'Print debugging info onto stderr'
-        },
-        '*': {
-            alias: 'tsConfigPath',
-            type: 'string',
-            default: './tsconfig.json',
-            describe: 'Path of the tsconfig.json'
-        }
-    }).argv;
+        ...commonOptions,
+        ...customOpts
+    })
+    .argv;
 
-export const cmdArgs = async (name: string) => {
-    const args = await argv(name);
+export const cmdArgs = async <T extends RuntimeConfig>(name: string, customOpts: Record<string, yargs.Options> = {}) => {
+    const args = await argv(name, customOpts);
 
-    const tsConfigPath = args['*'];
-    const fileFilters = args.files;
+    const tsConfigPath = args.tsConfigPath ?? args['*'];
     const excludeFiles = args.excludeFiles;
-    const typeFilters = args.classes;
 
     return {
         ...args,
         tsConfigPath,
-        fileFilters,
-        typeFilters,
-        excludeFiles
-    };
+        excludeFiles,
+
+        log: {
+            verbose: (...what: unknown[]) => {
+                if (args.verbose) {
+                    console.error(...what);
+                }
+            },
+            error: console.error
+        }
+
+    } as unknown as T;
 };

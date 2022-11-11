@@ -1,13 +1,10 @@
-#!/usr/bin/env node
-
 import { existsSync } from 'fs';
 import { createHash } from 'crypto';
-import * as path from 'path';
 import { Project, ts, VariableDeclaration, Node } from 'ts-morph';
 import * as _ from 'lodash';
 import * as rx from 'rxjs';
 import { findUp, first, getParentTypes, nodeTypeName, uniq, WalkChoice } from './gnomes';
-import { argv, cmdArgs, ParseConfig } from './cmdline';
+import { cmdArgs, RuntimeConfig } from './cmdline';
 
 export type GraphNode = {
     name: string;
@@ -15,18 +12,11 @@ export type GraphNode = {
     refs: string[];
 };
 
-export const code2graph = (opts: ParseConfig) => {
-    const log = {
-        verbose: (...args: unknown[]) => {
-            if (opts.verbose) {
-                console.error(args);
-            }
-        }
-    }
+export const code2graph = (runtime: RuntimeConfig) => {
 
-    log.verbose(opts);
+    runtime.log.verbose(runtime);
 
-    const { tsConfigPath, includeFiles, excludeFiles, acceptTypes } = opts;
+    const { tsConfigPath, includeFiles, excludeFiles, acceptTypes } = runtime;
 
     if (!existsSync(tsConfigPath)) {
         throw new Error(`Cannot find tsc config at ${tsConfigPath}`);
@@ -67,9 +57,7 @@ export const code2graph = (opts: ParseConfig) => {
                 types: v.varTypes.flatMap(c => nodeTypeName(c, checker)),
                 parentTypes: uniq(v.varTypes.flatMap(c => getParentTypes(c.compilerNode, checker)))
             })),
-            // rx.tap(n => log.verbose('a', n)),
             rx.filter(v => acceptedTypesForGraph(v.parentTypes)),
-            // rx.tap(n => log.verbose('b.refs', n, n.self.findReferences(), n.self.findReferencesAsNodes())),
             rx.map(v => ({
                 ...v,
                 class: v.types[0],
@@ -96,7 +84,6 @@ export const code2graph = (opts: ParseConfig) => {
     const inlinesInCalls = rx.from(sources)
         .pipe(
             rx.mergeMap(f => f.getDescendantsOfKind(ts.SyntaxKind.NewExpression)),
-            rx.tap(n => log.verbose(0, n.getText(), 1, n.getParent().getText())),
             // we don't need those assigned to vars
             rx.filter(n => !n.getParentIfKind(ts.SyntaxKind.VariableDeclaration)),
             rx.map(n => ({
@@ -124,8 +111,6 @@ export const code2graph = (opts: ParseConfig) => {
                     .filter(kid => kid?.isKind(ts.SyntaxKind.VariableDeclaration))) as VariableDeclaration;
 
                 const hostVar = callVar ?? n.node.getFirstAncestorByKind(ts.SyntaxKind.VariableDeclaration);
-
-                log.verbose(1.5, n.node.getText(), callVar?.getSymbol(), hostVar?.getSymbol());
 
                 if (hostVar) {
                     const hostTypes = getParentTypes(hostVar.compilerNode, checker);
@@ -156,7 +141,6 @@ export const code2graph = (opts: ParseConfig) => {
                     hostVar: undefined
                 };
             }),
-            rx.tap(n => log.verbose(2, n.node.getText(), 3, n.node.getParent().getText())),
             rx.map(n => ({
                 refs: [n.hostVar?.getStructure().name ?? ''].filter(v => !!v),
                 class: nodeTypeName(n.node, checker),
@@ -167,15 +151,12 @@ export const code2graph = (opts: ParseConfig) => {
                 ...n,
                 name: inlineId(n.class, n.txt)
             })),
-            rx.tap(n => log.verbose(3.5, n.txt, n.class, n.parentTypes)),
             rx.filter(n => acceptedTypesForGraph(n.parentTypes)),
-            rx.tap(n => log.verbose(4, n.txt, n.class, n.parentTypes)),
             rx.map(n => ({
                 name: n.name,
                 class: n.class,
                 refs: n.refs
             })),
-            rx.tap(n => log.verbose(5, n.name)),
         ) as rx.Observable<GraphNode>;
 
     return rx.merge(vars, inlinesInCalls);
@@ -189,3 +170,14 @@ if (require.main === module) {
             .subscribe(graph => console.log(JSON.stringify(graph, null, 2)));
     });
 };
+
+export const code2GraphCmd = () => cmdArgs('code2graph - parse a typescript project and print its architectural graph in JSON')
+    .then((args) =>
+        rx.firstValueFrom(code2graph(args)
+            .pipe(
+                rx.toArray(),
+                rx.map(graph => JSON.stringify(graph, null, 2))
+            )
+        ))
+    .then(console.log)
+    .catch(console.error);
