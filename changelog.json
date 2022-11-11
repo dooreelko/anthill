@@ -1,5 +1,11 @@
 [
   {
+    "story": "remarkeded",
+    "title": "2022-11-12 [feature]  Inline markdown editor.",
+    "desc": "",
+    "doc": "spec/remarkeded/design.md"
+  },
+  {
     "story": "ticketing",
     "title": "2022-10-31 [feature]  Ticketing within repo",
     "desc": "\nDesign specifications and ticketing integrated in the project’s\nrepository.",

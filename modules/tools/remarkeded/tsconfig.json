@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "composite": true,
+        "outDir": "dist",
+        "module": "ES2022"
+    },
+    "references": [],
+    "include": [
+        "**/*.ts"
+    ]
+}
