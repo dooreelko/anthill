@@ -18,7 +18,10 @@
         "watch": "tsc --watch --pretty",
         "test": "jest",
         "lint": "eslint $npm_config_local_prefix",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch",
+        "docs": "npm run docs:vis && npm run docs:code2graph",
+        "docs:vis": "./bin/vis --help | remarkeded --selector 'code[meta=vis]' --file README.md",
+        "docs:code2graph": "./bin/code2graph --help | remarkeded --selector 'code[meta=code2graph]' --file README.md"
     },
     "publishConfig": {
         "access": "public",
@@ -38,6 +41,7 @@
     },
     "devDependencies": {
         "@arinoto/eslint-config": "*",
+        "@arinoto/remarkeded": "*",
         "@types/yargs": "^17.0.13",
         "@types/lodash": "^4.14.0",
         "mdast": "3.0.0",
