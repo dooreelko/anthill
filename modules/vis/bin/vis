@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+ // code: language=javascript
+
+const {
+    visCmd
+} = require('../dist/src/main');
+
+(async () => await visCmd())();

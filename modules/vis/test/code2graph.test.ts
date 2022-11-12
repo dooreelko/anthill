@@ -20,7 +20,11 @@ test('archetype vars are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IVarMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -56,7 +60,11 @@ test('inline refs are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineCallMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -101,7 +109,11 @@ test('inline var refs are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineVarRefMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -152,7 +164,11 @@ test('inline indirect refs are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineIndirCallMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -189,7 +205,11 @@ test('inline news in constructors are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineNewInConstructorMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -226,7 +246,11 @@ test('inline news in calls are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineNewInCallMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -266,7 +290,11 @@ test('inline news in namespaced ref calls are discovered', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/IInlineNewInNamespaceCallMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
@@ -300,7 +328,11 @@ test('no-var news are discovered as inlines', (done) => {
         includeFiles: [new RegExp(path.basename(__filename))],
         excludeFiles: [],
         acceptTypes: [/INoVarNewCallMarker/],
-        verbose: false
+        verbose: false,
+        log: {
+            verbose: () => { },
+            error: () => { }
+        }
     }).pipe(rx.toArray())
         .subscribe(graph => {
             try {
