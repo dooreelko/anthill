@@ -32,7 +32,8 @@
         "clean": "npx lerna list --json | jq -r '.[].location' | xargs -I{} rm -rf '{}/dist'",
         "ci:test-all": "$npm_config_local_prefix/ci/test-all.sh",
         "ci:publish-check": "$npm_config_local_prefix/ci/publish-check.sh",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "docs": "$npm_config_local_prefix/ci/changelog.sh"
     },
     "repository": {
         "type": "git",

@@ -1,0 +1,45 @@
+{
+    "name": "@arinoto/remarkeded",
+    "version": "1.0.0",
+    "description": "@anthill's markdown inline editor",
+    "main": "dist/src/main.js",
+    "bin": {
+        "remarkeded": "dist/src/main.js"
+    },
+    "type": "module",
+    "scripts": {
+        "build": "tsc && npm run post-build",
+        "compile": "tsc --pretty && npm run post-build",
+        "post-build": "chmod u+x ./dist/src/main.js",
+        "watch": "tsc --watch --pretty",
+        "lint": "eslint $npm_config_local_prefix",
+        "docs": "./dist/src/main.js --help | ./dist/src/main.js --selector 'heading[depth=2] ~ code[meta=generated]' --file README.md"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "yargs": "17.6.2",
+        "unified": "10.1.2",
+        "remark": "14.0.2",
+        "remark-parse": "10.0.1",
+        "remark-stringify": "10.0.2",
+        "unist-util-select": "4.0.1",
+        "chalk": "5.1.2"
+    },
+    "devDependencies": {
+        "@arinoto/eslint-config": "*",
+        "@types/yargs": "17.0.13"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dooreelko/dorc.git"
+    },
+    "author": "dooreelko",
+    "license": "LGPL-3.0",
+    "bugs": {
+        "url": "https://github.com/dooreelko/dorc/issues"
+    },
+    "homepage": "https://github.com/dooreelko/dorc#readme"
+}
