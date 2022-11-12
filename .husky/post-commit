@@ -1,4 +1,11 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-./ci/changelog.sh
+set -x
+
+npx lerna run docs
+
+if [ "$(git status | grep -c '.md')" -gt 0 ]; then 
+    git status | grep -E '.md|changelog.json' | cut -d ':' -f2 | xargs git add
+    git commit --amend --reuse-message=HEAD --no-verify
+fi

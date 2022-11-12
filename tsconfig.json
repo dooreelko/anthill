@@ -18,6 +18,9 @@
             "path": "./modules/tools/lambda-dist/tsconfig.json"
         },
         {
+            "path": "./modules/tools/remarkeded/tsconfig.json"
+        },
+        {
             "path": "./modules/demos/dorc/tsconfig.json"
         },
         {
