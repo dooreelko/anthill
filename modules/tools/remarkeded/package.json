@@ -1,6 +1,6 @@
 {
     "name": "@arinoto/remarkeded",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "@anthill's markdown inline editor",
     "main": "dist/src/main.js",
     "bin": {
@@ -20,13 +20,13 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "yargs": "17.6.2",
-        "unified": "10.1.2",
+        "chalk": "5.1.2",
         "remark": "14.0.2",
         "remark-parse": "10.0.1",
         "remark-stringify": "10.0.2",
+        "unified": "10.1.2",
         "unist-util-select": "4.0.1",
-        "chalk": "5.1.2"
+        "yargs": "17.6.2"
     },
     "devDependencies": {
         "@arinoto/eslint-config": "*",
@@ -41,5 +41,6 @@
     "bugs": {
         "url": "https://github.com/dooreelko/dorc/issues"
     },
-    "homepage": "https://github.com/dooreelko/dorc#readme"
+    "homepage": "https://github.com/dooreelko/dorc#readme",
+    "gitHead": "8e913079e7ad915404fda467eadc6c799c73305b"
 }
