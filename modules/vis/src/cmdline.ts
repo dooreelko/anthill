@@ -78,8 +78,8 @@ export const visOptions: Record<string, yargs.Options> = {
 };
 
 export const argv = async <T extends Record<string, yargs.Options>>(desc: string, customOpts: T) => yargs(process.argv.slice(2))
+    .parserConfiguration({ 'unknown-options-as-args': true })
     .usage(`${desc}`)
-    .strict()
     .options({
         ...commonOptions,
         ...customOpts
@@ -89,7 +89,7 @@ export const argv = async <T extends Record<string, yargs.Options>>(desc: string
 export const cmdArgs = async <T extends RuntimeConfig>(name: string, customOpts: Record<string, yargs.Options> = {}) => {
     const args = await argv(name, customOpts);
 
-    const tsConfigPath = args.tsConfigPath ?? args['*'];
+    const tsConfigPath = ([...args._, ''][0]) ?? args.tsConfigPath;
     const excludeFiles = args.excludeFiles;
 
     return {
