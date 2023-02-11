@@ -5,11 +5,10 @@
     "description": "Actually cloud-native container orchestrator",
     "main": "dist/src/main.js",
     "scripts": {
-        "get": "cdktf get",
         "build": "tsc && npm run post-build:npm",
-        "post-build:npm": "lerna bootstrap --scope ${npm_package_name} -- --omit=dev && cp --recursive --dereference node_modules dist || lerna bootstrap --scope ${npm_package_name}",
-        "synth": "cdktf synth",
-        "deploy": "cdktf deploy --auto-approve",
+        "post-build:npm": "dep-copy . dist",
+        "synth": "npx cdktf synth",
+        "deploy": "npx cdktf-cli deploy --auto-approve",
         "compile": "tsc --pretty && npm run post-build",
         "watch": "tsc --watch --pretty && npm run post-build",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
@@ -35,6 +34,7 @@
         "constructs": "^10.1.48"
     },
     "devDependencies": {
-        "@arinoto/vis": "*"
+        "@arinoto/vis": "*",
+        "@arinoto/dep-copy": "*"
     }
 }
