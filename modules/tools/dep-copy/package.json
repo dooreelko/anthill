@@ -1,6 +1,6 @@
 {
     "name": "@arinoto/dep-copy",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "@anthill's runteme dependency copier",
     "main": "dist/src/main.js",
     "bin": "dist/src/main.js",

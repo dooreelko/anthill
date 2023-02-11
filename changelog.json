@@ -1,5 +1,11 @@
 [
   {
+    "story": "resolve",
+    "title": "2023-02-11 [feature]  Resolve runtime dependencies in parent directories",
+    "desc": "\nUse node’s require/import mechanics to find the source location of a\nproduction dependency. Recursively.",
+    "doc": "spec/resolve/design.md"
+  },
+  {
     "story": "vis-bin",
     "title": "2023-01-30 [fix]  Vis binaries using bin-dir",
     "desc": "\nThat was a neat idea, but seems like wile npm and yarn respect\n`directories.bin` when run directly, lerna’s on-the-fly modification of\npackage.json somehow breaks it.",
