@@ -1,5 +1,11 @@
 # Arinoto changelog
 
+## 2023-02-11 [feature]  Resolve runtime dependencies in parent directories
+
+Use node’s require/import mechanics to find the source location of a
+production dependency. Recursively.
+[More information](<spec/resolve/design.md>)
+
 ## 2023-01-30 [fix]  Vis binaries using bin-dir
 
 That was a neat idea, but seems like wile npm and yarn respect
@@ -24,4 +30,4 @@ repository.
 [More information](<spec/000 ticketing/design.md>)
 
 ### Modules changed:
- - @arinoto/vis 1.3.1->1.3.2
+ - @arinoto/dep-copy 1.1.0->1.2.0
